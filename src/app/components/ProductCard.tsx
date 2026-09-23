@@ -1,10 +1,14 @@
+import Link from "next/link";
+
 type ProductCardProps = {
+    id: string;
     name: string;
     price: number;
     category: string;
 };
 
 export default function ProductCard({
+    id,
     name,
     price,
     category,
@@ -20,9 +24,9 @@ export default function ProductCard({
             <p className="mt-2 font-bold">
                 &#8358;{price.toLocaleString()}
             </p>
-            <button className="mt-4 w-full rounded-lg bg-black px-4 py-2 text-white">
+            <Link  href={`marketplace/${id}`} className="mt-4 w-full rounded-lg bg-blue-500 hover:bg-blue-300 px-4 py-2 text-white">
                 View Product
-            </button>
+            </Link>
 
         </div>
     );

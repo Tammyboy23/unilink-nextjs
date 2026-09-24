@@ -1,26 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Audiowide&family=Bebas+Neue&family=Cabin:ital,wght@0,400..700;1,400..700&family=Chocolate+Classical+Sans&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Fjalla+One&family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Luckiest+Guy&family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Oswald:wght@200..700&family=Outfit:wght@100..900&family=Pacifico&family=Playwrite+CU+Guides&family=Playwrite+DE+SAS+Guides&family=Protest+Strike&family=Roboto:ital,wght@0,100..900;1,100..900&family=Rubik:ital,wght@0,300..900;1,300..900&family=Tuffy:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@theme {
+  --font-audiowide: "Audiowide", sans-serif;
+  --font-bebas: "Bebas Neue", sans-serif;
+  --font-cabin: "Cabin", sans-serif;
+  --font-chocolate: "Chocolate Classical Sans", sans-serif;
+  --font-dm-sans: "DM Sans", sans-serif;
+  --font-fjalla: "Fjalla One", sans-serif;
+  --font-google-sans: "Google Sans", sans-serif;
+  --font-inter: "Inter", sans-serif;
+  --font-jetbrains: "JetBrains Mono", monospace;
+  --font-luckiest: "Luckiest Guy", cursive;
+  --font-noto-sans: "Noto Sans", sans-serif;
+  --font-oswald: "Oswald", sans-serif;
+  --font-outfit: "Outfit", sans-serif;
+  --font-pacifico: "Pacifico", cursive;
+  --font-playwrite-cu: "Playwrite CU Guides", cursive;
+  --font-playwrite-de: "Playwrite DE SAS Guides", cursive;
+  --font-protest: "Protest Strike", sans-serif;
+  --font-roboto: "Roboto", sans-serif;
+  --font-rubik: "Rubik", sans-serif;
+  --font-tuffy: "Tuffy", sans-serif;
 }

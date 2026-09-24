@@ -1,13 +1,22 @@
-import Navbar from "./components/Navbar"
+import Navbar from "./components/Navbar";
+import {
+  ArrowRight,
+  BadgeCheck,
+  ChartColumn,
+  ShoppingBag,
+  Sparkles,
+} from "lucide-react";
 
-export default function Home(){
-  return(
+
+export default function Home() {
+  return (
     <>
-    <Navbar />
-    <main className="flex flex-col gap-6 justify-center items-center p-6">
-      <h1 className="text-4xl font-extrabold text-[#fff] mt-4">Unilink</h1>
-      <p>Your University Marketplace.</p>
-    </main>
+      <Navbar />
+
+      <main className="min-h-screen bg-[#f5f0e8] text-slate-900">
+        
+                  
+      </main>
     </>
-  )
+  );
 }

@@ -3,7 +3,7 @@ import { Plus, ShoppingBag, LayoutDashboard , MessageSquare} from "lucide-react"
 
 export default function Navbar(){
     return(
-        <nav className=" fixed top-0 w-full flex items-center justify-center bg-[#fffdf7] px-6 py-4 border-b gap-40 shadow-sm">
+        <nav className=" fixed top-0 w-full flex items-center justify-center bg-[#fffdf7] px-6 py-4 border-b gap-40 shadow-sm z-50">
             <Link href="/" className="text-2xl font-bold font-inter ">
             <span className="text-emerald-600 font-[JetBrains Mono]">Uni</span>link
             </Link>

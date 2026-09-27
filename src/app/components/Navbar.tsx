@@ -1,26 +1,31 @@
+"use client";
 import Link from "next/link";
-import { Plus, ShoppingBag, LayoutDashboard , MessageSquare} from "lucide-react";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
+import { Plus, ShoppingBag, LayoutDashboard, User } from "lucide-react";
 
 export default function Navbar(){
+    const pathname = usePathname()
     return(
-        <nav className=" fixed top-0 w-full flex items-center justify-center bg-[#fffdf7] px-6 py-4 border-b gap-40 shadow-sm z-50">
-            <Link href="/" className="text-2xl font-bold font-inter ">
-            <span className="text-emerald-600 font-[JetBrains Mono]">Uni</span>link
+        <nav className=" fixed top-0 w-full flex items-center justify-center bg-white px-6 py-4 border-b border-gray-200 gap-40 shadow-sm z-50">
+            <Link href="/" className="flex items-center gap-2 font-inter text-2xl font-bold">
+            <Image src="/logo.png" width={36} height={36} alt="" className="h-9 w-9 object-contain rounded-lg" />
+            <span><span className="text-emerald-600 font-[JetBrains Mono]">Uni</span>link</span>
             </Link>
 
             <div className="flex gap-6 hidden md:flex">
-                <Link href="/" className="flex items-center gap-2 text-gray-700 hover:bg-emerald-100 px-4 py-2 rounded-lg hover:text-emerald-600 font-semibold font-outfit">
+                <Link href="/" className={`flex items-center gap-2 hover:text-black px-4 py-2 rounded-lg  font-semibold font-outfit ${pathname === "/"? "bg-emerald-100 text-emerald-600 hover:text-emerald-600": "text-gray-700"}`}>
                    <LayoutDashboard size={20}/> Dashboard
                 </Link>
-                <Link href="/marketplace" className="flex items-center gap-2 text-gray-700 hover:bg-emerald-100 px-4 py-2 rounded-lg hover:text-emerald-600 font-semibold font-outfit">
+                <Link href="/marketplace" className={`flex items-center gap-2 hover:text-black px-4 py-2 rounded-lg  font-semibold font-outfit ${pathname === "/marketplace"? "bg-emerald-100 text-emerald-600 hover:text-emerald-600": "text-gray-700"}`}>
                    <ShoppingBag size={20}/> Marketplace
                 </Link>
-                <Link href="/messages" className="flex items-center gap-2 text-gray-700 hover:bg-emerald-100 px-4 py-2 rounded-lg hover:text-emerald-600 font-semibold font-outfit">
-                    <MessageSquare size={20} />Messages
+                <Link href="/profile" className={`flex items-center gap-2 hover:text-black px-4 py-2 rounded-lg  font-semibold font-outfit ${pathname === "/profile"? "bg-emerald-100 text-emerald-600 hover:text-emerald-600": "text-gray-700"}`}>
+                    <User size={20} />Profile
                 </Link>
             </div>
 
-            <button className="flex flex-row  bg-emerald-600 p-2 rounded-full px-4 text-white gap-2 font-[inter] font-semibold hover:bg-emerald-300"><Plus />  Post Product</button>
+            <button className="flex flex-row  bg-emerald-600 p-2 rounded-full px-4 text-white gap-1.5 font-[inter] font-semibold hover:bg-emerald-300"><Plus />  Post</button>
         </nav>
     );
 }

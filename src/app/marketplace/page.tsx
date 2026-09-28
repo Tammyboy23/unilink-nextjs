@@ -104,7 +104,7 @@ export default function Marketplace(){
             {/* PRODUCTS GRID SECTION */}
             <div className="grid grid-cols-3 max-md:grid-cols-2 mt-20  gap-8 max-md:gap-3">
            {products.map((product,index) => (
-                <div className="border border-gray-300 shadow-lg flex  flex-1 flex-col group rounded-xl transition duration-300 overflow-hidden hover:-translate-y-1" key={index}>
+                <Link href={`/marketplace/${product.id}`}className="border border-gray-300 shadow-lg flex  flex-1 flex-col group rounded-xl transition duration-300 overflow-hidden hover:-translate-y-1" key={index}>
                     <div className="relative aspect-[4/3] overflow-hidden">
                         <img src={product.img} alt={product.img} className="w-full h-full group-hover:scale-105 transition duration-300" />
                         <span className=" absolute top-3 left-3 bg-emerald-600 rounded-full py-1.5 px-4 text-[12px] max-md:text-xs text-white font-semibold font-outfit">{product.category}</span>
@@ -117,9 +117,9 @@ export default function Marketplace(){
                             <h1 className="font-bold font-outfit text-3xl font-outfit max-md:text-base">&#8358;{product.price.toLocaleString()}</h1>
                             <h1 className="flex gap-2 items-center font-semibold font-rubik bg-yellow-50 border border-yellow-400 rounded-lg p-2 text-brown-600 font-jetbrains hidden max-md:blocked"><Star size={15} fill="currentColor" className="text-yellow-500" />{product.rating}</h1>
                         </div>
-                        <Link href={`/marketplace/${product.id}`} className="flex w-full bg-emerald-50 border border-emerald-500 mt-3 text-center items-center justify-center text-emerald-800 py-2 font-outfit font-semibold rounded-xl gap-2 font-outfit hover:bg-emerald-500 hover:text-white"><ShoppingCart size={17}/> Get Item</Link>
+                        {/* <Link href={`/marketplace/${product.id}`} className="flex w-full bg-emerald-50 border border-emerald-500 mt-3 text-center items-center justify-center text-emerald-800 py-2 font-outfit font-semibold rounded-xl gap-2 font-outfit hover:bg-emerald-500 hover:text-white"><ShoppingCart size={17}/> Get Item</Link> */}
                     </div>
-                </div>
+                </Link>
            ))}
         </div>            
         </main>

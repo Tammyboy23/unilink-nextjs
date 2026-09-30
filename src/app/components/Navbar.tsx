@@ -2,12 +2,12 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Plus, ShoppingBag, LayoutDashboard, User } from "lucide-react";
+import { Plus, ShoppingBag, LayoutDashboard, User, Bell } from "lucide-react";
 
 export default function Navbar(){
     const pathname = usePathname()
     return(
-        <nav className=" fixed top-0 w-full flex items-center justify-center bg-white px-6 py-4 border-b border-gray-200 gap-40 shadow-sm z-50">
+        <nav className=" fixed top-0 w-full flex items-center justify-between bg-white px-25 max-md:px-5 py-4 border-b border-gray-200 gap-40 shadow-sm z-50">
             <Link href="/" className="flex items-center gap-2 font-inter text-2xl font-bold">
             <Image src="/logo.png" width={36} height={36} alt="" className="h-9 w-9 object-contain rounded-lg" />
             <span><span className="text-emerald-600 font-[JetBrains Mono]">Uni</span>link</span>
@@ -25,7 +25,10 @@ export default function Navbar(){
                 </Link>
             </div>
 
-            <button className="flex flex-row  bg-emerald-600 p-2 rounded-full px-4 text-white gap-1.5 font-[inter] font-semibold hover:bg-emerald-300"><Plus />  Post</button>
+            <div className="flex gap-6">
+                <button className="hover:bg-slate-200 px-2.5 rounded-xl"><Bell size={20} /></button>
+                <img src="profile.jpg" alt="" className="w-10 h-10 rounded-full border border-emerald-600" />
+            </div>
         </nav>
     );
 }

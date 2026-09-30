@@ -1,10 +1,29 @@
 import { NextResponse } from "next/server";
+import pool from "../lib/db";
 
 export async function GET(){
-    const products = [
-        { id: 1, title: "Calculus Textbook", price: 25 },
-        { id: 2, title: "TI-84 Calculator", price: 60 },
-    ];
 
-    return NextResponse.json(products)
+    try {
+    const { rows } = await pool.query("SELECT * FROM products");
+    return NextResponse.json(rows);
+  } catch (error: any) {
+    return NextResponse.json(
+      { error: error.message || "Something went wrong" },
+      { status: 500 }
+    );
+  }
 }
+
+export async function POST(request: Request) {
+    try{
+    const body = await request.json();
+    const  {} = body;
+    }catch(error: any){
+        return NextResponse.json(
+            {error: error.message},
+            {status: 500}
+        );
+    }
+    
+}
+

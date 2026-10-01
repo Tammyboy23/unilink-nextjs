@@ -24,6 +24,10 @@ export async function PATCH(request: Request){
     const body = await request.json()
     const {displayname, profile_pic, id} = body;
     await pool.query("UPDATE users SET displayname = $1, profile_pic = $2 WHERE id = $3",[displayname, profile_pic, id])
+    return NextResponse.json(
+        {message: "Update Successful"},
+        {status: 200}
+    )
     }catch(error: any){
         return NextResponse.json(
             {error: error.message},

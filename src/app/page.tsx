@@ -1,5 +1,7 @@
 import Navbar from "./components/Navbar";
 import { DollarSign , Box , TrendingUp, Eye} from "lucide-react";
+import { getCurrentUser } from "./api/lib/auth";
+import { redirect } from "next/navigation"; 
 
 type Stats = {
   color: string;
@@ -9,6 +11,10 @@ type Stats = {
 }
 
 export default function Home() {
+  const user = getCurrentUser()
+  if (!user){
+    redirect('/login');
+  }
   return (
     <>
       <Navbar />

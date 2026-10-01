@@ -24,10 +24,22 @@ export async function POST(request: Request){
             {status: 401}
         )
     }
-    return NextResponse.json(
-        {userID: user.id},
-        {status: 200}
+    const token = jwt.sign(
+        {userID: user.id, email: user.email},
+        process.env.JWT_SECRET!,
+        { expiresIn: "7d"}
     )
+
+    const response = NextResponse.json({email: user.email});
+    response.cookies.set("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 60 * 60 * 24 * 7,
+        path: "/"
+    });
+
+    return response
 
 
 

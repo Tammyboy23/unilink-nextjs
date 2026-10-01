@@ -1,0 +1,82 @@
+Date : 2026-10-01 17:55:09
+Directory : c:\Users\Tamilore\Documents\Projects\Unilink
+Total : 32 files,  8246 codes, 21 comments, 111 blanks, all 8378 lines
+
+Languages
++--------------------+------------+------------+------------+------------+------------+
+| language           | files      | code       | comment    | blank      | total      |
++--------------------+------------+------------+------------+------------+------------+
+| JSON               |          2 |      7,328 |          0 |          2 |      7,330 |
+| TypeScript JSX     |         11 |        649 |         15 |         53 |        717 |
+| TypeScript         |          7 |        159 |          2 |         29 |        190 |
+| JSON with Comments |          1 |         34 |          0 |          1 |         35 |
+| Markdown           |          3 |         27 |          2 |         20 |         49 |
+| PostCSS            |          1 |         24 |          0 |          1 |         25 |
+| JavaScript         |          2 |         20 |          2 |          5 |         27 |
+| XML                |          5 |          5 |          0 |          0 |          5 |
++--------------------+------------+------------+------------+------------+------------+
+
+Directories
++---------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                            | files      | code       | comment    | blank      | total      |
++---------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                               |         32 |      8,246 |         21 |        111 |      8,378 |
+| . (Files)                                                                       |          9 |      7,414 |          5 |         31 |      7,450 |
+| public                                                                          |          5 |          5 |          0 |          0 |          5 |
+| src                                                                             |         18 |        827 |         16 |         80 |        923 |
+| src\app                                                                         |         18 |        827 |         16 |         80 |        923 |
+| src\app (Files)                                                                 |          3 |        107 |          0 |          9 |        116 |
+| src\app\api                                                                     |          6 |        154 |          1 |         26 |        181 |
+| src\app\api\auth                                                                |          2 |         80 |          0 |         11 |         91 |
+| src\app\api\auth\login                                                          |          1 |         44 |          0 |          8 |         52 |
+| src\app\api\auth\signup                                                         |          1 |         36 |          0 |          3 |         39 |
+| src\app\api\lib                                                                 |          2 |         22 |          1 |          5 |         28 |
+| src\app\api\product                                                             |          1 |         24 |          0 |          6 |         30 |
+| src\app\api\profile                                                             |          1 |         28 |          0 |          4 |         32 |
+| src\app\components                                                              |          4 |        253 |          6 |         28 |        287 |
+| src\app\login                                                                   |          1 |          4 |          0 |          1 |          5 |
+| src\app\marketplace                                                             |          2 |        243 |          4 |          8 |        255 |
+| src\app\marketplace (Files)                                                     |          1 |        122 |          3 |          4 |        129 |
+| src\app\marketplace\[id]                                                        |          1 |        121 |          1 |          4 |        126 |
+| src\app\profile                                                                 |          1 |         62 |          5 |          7 |         74 |
+| src\app\signup                                                                  |          1 |          4 |          0 |          1 |          5 |
++---------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++---------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| filename                                                                        | language           | code       | comment    | blank      | total      |
++---------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| c:\Users\Tamilore\Documents\Projects\Unilink\AGENTS.md                          | Markdown           |          3 |          2 |          5 |         10 |
+| c:\Users\Tamilore\Documents\Projects\Unilink\CLAUDE.md                          | Markdown           |          1 |          0 |          1 |          2 |
+| c:\Users\Tamilore\Documents\Projects\Unilink\README.md                          | Markdown           |         23 |          0 |         14 |         37 |
+| c:\Users\Tamilore\Documents\Projects\Unilink\eslint.config.mjs                  | JavaScript         |         14 |          2 |          3 |         19 |
+| c:\Users\Tamilore\Documents\Projects\Unilink\next.config.ts                     | TypeScript         |          5 |          1 |          3 |          9 |
+| c:\Users\Tamilore\Documents\Projects\Unilink\package-lock.json                  | JSON               |      7,288 |          0 |          1 |      7,289 |
+| c:\Users\Tamilore\Documents\Projects\Unilink\package.json                       | JSON               |         40 |          0 |          1 |         41 |
+| c:\Users\Tamilore\Documents\Projects\Unilink\postcss.config.mjs                 | JavaScript         |          6 |          0 |          2 |          8 |
+| c:\Users\Tamilore\Documents\Projects\Unilink\public\file.svg                    | XML                |          1 |          0 |          0 |          1 |
+| c:\Users\Tamilore\Documents\Projects\Unilink\public\globe.svg                   | XML                |          1 |          0 |          0 |          1 |
+| c:\Users\Tamilore\Documents\Projects\Unilink\public\next.svg                    | XML                |          1 |          0 |          0 |          1 |
+| c:\Users\Tamilore\Documents\Projects\Unilink\public\vercel.svg                  | XML                |          1 |          0 |          0 |          1 |
+| c:\Users\Tamilore\Documents\Projects\Unilink\public\window.svg                  | XML                |          1 |          0 |          0 |          1 |
+| c:\Users\Tamilore\Documents\Projects\Unilink\src\app\api\auth\login\route.ts    | TypeScript         |         44 |          0 |          8 |         52 |
+| c:\Users\Tamilore\Documents\Projects\Unilink\src\app\api\auth\signup\route.ts   | TypeScript         |         36 |          0 |          3 |         39 |
+| c:\Users\Tamilore\Documents\Projects\Unilink\src\app\api\lib\auth.ts            | TypeScript         |         16 |          1 |          3 |         20 |
+| c:\Users\Tamilore\Documents\Projects\Unilink\src\app\api\lib\db.ts              | TypeScript         |          6 |          0 |          2 |          8 |
+| c:\Users\Tamilore\Documents\Projects\Unilink\src\app\api\product\route.ts       | TypeScript         |         24 |          0 |          6 |         30 |
+| c:\Users\Tamilore\Documents\Projects\Unilink\src\app\api\profile\route.ts       | TypeScript         |         28 |          0 |          4 |         32 |
+| c:\Users\Tamilore\Documents\Projects\Unilink\src\app\components\AuthForm.tsx    | TypeScript JSX     |        110 |          0 |         12 |        122 |
+| c:\Users\Tamilore\Documents\Projects\Unilink\src\app\components\BottomNav.tsx   | TypeScript JSX     |         35 |          0 |          6 |         41 |
+| c:\Users\Tamilore\Documents\Projects\Unilink\src\app\components\Navbar.tsx      | TypeScript JSX     |         31 |          0 |          3 |         34 |
+| c:\Users\Tamilore\Documents\Projects\Unilink\src\app\components\ProductCard.tsx | TypeScript JSX     |         77 |          6 |          7 |         90 |
+| c:\Users\Tamilore\Documents\Projects\Unilink\src\app\globals.css                | PostCSS            |         24 |          0 |          1 |         25 |
+| c:\Users\Tamilore\Documents\Projects\Unilink\src\app\layout.tsx                 | TypeScript JSX     |         29 |          0 |          5 |         34 |
+| c:\Users\Tamilore\Documents\Projects\Unilink\src\app\login\page.tsx             | TypeScript JSX     |          4 |          0 |          1 |          5 |
+| c:\Users\Tamilore\Documents\Projects\Unilink\src\app\marketplace\[id]\page.tsx  | TypeScript JSX     |        121 |          1 |          4 |        126 |
+| c:\Users\Tamilore\Documents\Projects\Unilink\src\app\marketplace\page.tsx       | TypeScript JSX     |        122 |          3 |          4 |        129 |
+| c:\Users\Tamilore\Documents\Projects\Unilink\src\app\page.tsx                   | TypeScript JSX     |         54 |          0 |          3 |         57 |
+| c:\Users\Tamilore\Documents\Projects\Unilink\src\app\profile\page.tsx           | TypeScript JSX     |         62 |          5 |          7 |         74 |
+| c:\Users\Tamilore\Documents\Projects\Unilink\src\app\signup\page.tsx            | TypeScript JSX     |          4 |          0 |          1 |          5 |
+| c:\Users\Tamilore\Documents\Projects\Unilink\tsconfig.json                      | JSON with Comments |         34 |          0 |          1 |         35 |
+| Total                                                                           |                    |      8,246 |         21 |        111 |      8,378 |
++---------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+

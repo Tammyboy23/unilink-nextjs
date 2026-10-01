@@ -1,0 +1,34 @@
+"filename", "language", "JavaScript", "Markdown", "TypeScript JSX", "TypeScript", "JSON with Comments", "PostCSS", "JSON", "XML", "comment", "blank", "total"
+"c:\Users\Tamilore\Documents\Projects\Unilink\AGENTS.md", "Markdown", 0, 3, 0, 0, 0, 0, 0, 0, 2, 5, 10
+"c:\Users\Tamilore\Documents\Projects\Unilink\CLAUDE.md", "Markdown", 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\Users\Tamilore\Documents\Projects\Unilink\README.md", "Markdown", 0, 23, 0, 0, 0, 0, 0, 0, 0, 14, 37
+"c:\Users\Tamilore\Documents\Projects\Unilink\eslint.config.mjs", "JavaScript", 14, 0, 0, 0, 0, 0, 0, 0, 2, 3, 19
+"c:\Users\Tamilore\Documents\Projects\Unilink\next.config.ts", "TypeScript", 0, 0, 0, 5, 0, 0, 0, 0, 1, 3, 9
+"c:\Users\Tamilore\Documents\Projects\Unilink\package-lock.json", "JSON", 0, 0, 0, 0, 0, 0, 7288, 0, 0, 1, 7289
+"c:\Users\Tamilore\Documents\Projects\Unilink\package.json", "JSON", 0, 0, 0, 0, 0, 0, 40, 0, 0, 1, 41
+"c:\Users\Tamilore\Documents\Projects\Unilink\postcss.config.mjs", "JavaScript", 6, 0, 0, 0, 0, 0, 0, 0, 0, 2, 8
+"c:\Users\Tamilore\Documents\Projects\Unilink\public\file.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1
+"c:\Users\Tamilore\Documents\Projects\Unilink\public\globe.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1
+"c:\Users\Tamilore\Documents\Projects\Unilink\public\next.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1
+"c:\Users\Tamilore\Documents\Projects\Unilink\public\vercel.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1
+"c:\Users\Tamilore\Documents\Projects\Unilink\public\window.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1
+"c:\Users\Tamilore\Documents\Projects\Unilink\src\app\api\auth\login\route.ts", "TypeScript", 0, 0, 0, 44, 0, 0, 0, 0, 0, 8, 52
+"c:\Users\Tamilore\Documents\Projects\Unilink\src\app\api\auth\signup\route.ts", "TypeScript", 0, 0, 0, 36, 0, 0, 0, 0, 0, 3, 39
+"c:\Users\Tamilore\Documents\Projects\Unilink\src\app\api\lib\auth.ts", "TypeScript", 0, 0, 0, 16, 0, 0, 0, 0, 1, 3, 20
+"c:\Users\Tamilore\Documents\Projects\Unilink\src\app\api\lib\db.ts", "TypeScript", 0, 0, 0, 6, 0, 0, 0, 0, 0, 2, 8
+"c:\Users\Tamilore\Documents\Projects\Unilink\src\app\api\product\route.ts", "TypeScript", 0, 0, 0, 24, 0, 0, 0, 0, 0, 6, 30
+"c:\Users\Tamilore\Documents\Projects\Unilink\src\app\api\profile\route.ts", "TypeScript", 0, 0, 0, 28, 0, 0, 0, 0, 0, 4, 32
+"c:\Users\Tamilore\Documents\Projects\Unilink\src\app\components\AuthForm.tsx", "TypeScript JSX", 0, 0, 110, 0, 0, 0, 0, 0, 0, 12, 122
+"c:\Users\Tamilore\Documents\Projects\Unilink\src\app\components\BottomNav.tsx", "TypeScript JSX", 0, 0, 35, 0, 0, 0, 0, 0, 0, 6, 41
+"c:\Users\Tamilore\Documents\Projects\Unilink\src\app\components\Navbar.tsx", "TypeScript JSX", 0, 0, 31, 0, 0, 0, 0, 0, 0, 3, 34
+"c:\Users\Tamilore\Documents\Projects\Unilink\src\app\components\ProductCard.tsx", "TypeScript JSX", 0, 0, 77, 0, 0, 0, 0, 0, 6, 7, 90
+"c:\Users\Tamilore\Documents\Projects\Unilink\src\app\globals.css", "PostCSS", 0, 0, 0, 0, 0, 24, 0, 0, 0, 1, 25
+"c:\Users\Tamilore\Documents\Projects\Unilink\src\app\layout.tsx", "TypeScript JSX", 0, 0, 29, 0, 0, 0, 0, 0, 0, 5, 34
+"c:\Users\Tamilore\Documents\Projects\Unilink\src\app\login\page.tsx", "TypeScript JSX", 0, 0, 4, 0, 0, 0, 0, 0, 0, 1, 5
+"c:\Users\Tamilore\Documents\Projects\Unilink\src\app\marketplace\[id]\page.tsx", "TypeScript JSX", 0, 0, 121, 0, 0, 0, 0, 0, 1, 4, 126
+"c:\Users\Tamilore\Documents\Projects\Unilink\src\app\marketplace\page.tsx", "TypeScript JSX", 0, 0, 122, 0, 0, 0, 0, 0, 3, 4, 129
+"c:\Users\Tamilore\Documents\Projects\Unilink\src\app\page.tsx", "TypeScript JSX", 0, 0, 54, 0, 0, 0, 0, 0, 0, 3, 57
+"c:\Users\Tamilore\Documents\Projects\Unilink\src\app\profile\page.tsx", "TypeScript JSX", 0, 0, 62, 0, 0, 0, 0, 0, 5, 7, 74
+"c:\Users\Tamilore\Documents\Projects\Unilink\src\app\signup\page.tsx", "TypeScript JSX", 0, 0, 4, 0, 0, 0, 0, 0, 0, 1, 5
+"c:\Users\Tamilore\Documents\Projects\Unilink\tsconfig.json", "JSON with Comments", 0, 0, 0, 0, 34, 0, 0, 0, 0, 1, 35
+"Total", "-", 20, 27, 649, 159, 34, 24, 7328, 5, 21, 111, 8378

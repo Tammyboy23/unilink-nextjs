@@ -13,6 +13,10 @@ const links = [
 export default function BottomNav() {
     const pathname = usePathname();
 
+    if (pathname === "/login" || pathname === "/signup") {
+        return null;
+    }
+
     return (
         <nav aria-label="Main navigation" className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200/80 bg-white/95 px-2 pt-2 shadow-[0_-8px_30px_rgba(15,23,42,0.08)] backdrop-blur-md pb-[calc(env(safe-area-inset-bottom)+0.5rem)] md:hidden">
             <div className="mx-auto flex max-w-lg items-stretch justify-around gap-1">

@@ -7,7 +7,7 @@ export async function POST(request: Request){
     const body = await request.json()
     const {email, username, school, password} = body
 
-    if(!email && !password){
+    if(!email || !password){
         return NextResponse.json(
             {error: "Email & Password is required"},
             {status: 401}
@@ -17,7 +17,7 @@ export async function POST(request: Request){
     if (existed.rows.length > 0){
         return NextResponse.json(
             {error: "Account Already Exists "},
-            {status: 401}
+            {status: 409}
         )
     }
     const hashed = await bcrypt.hash(password, 10)
@@ -32,7 +32,7 @@ export async function POST(request: Request){
     catch(error: any){
         return NextResponse.json(
             {error: error.message},
-            {status: 401}
+            {status: 500}
         )
     }
 

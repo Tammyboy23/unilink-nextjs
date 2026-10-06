@@ -3,8 +3,18 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Plus, ShoppingBag, LayoutDashboard, User, Bell } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export default function Navbar(){
+    const [profile, setProfile] = useState([])
+
+    useEffect(() => {
+        fetch("/api/profile")
+        .then((res) => res.json())
+        .then((data) => {
+            setProfile(data)
+        })
+    },[])
     const pathname = usePathname()
     return(
         <nav className=" fixed top-0 w-full flex items-center justify-between bg-white px-25 max-md:px-5 py-4 border-b border-gray-200 gap-40 shadow-sm z-50">
@@ -27,7 +37,8 @@ export default function Navbar(){
 
             <div className="flex gap-6">
                 <button className="hover:bg-slate-200 px-2.5 rounded-xl"><Bell size={20} /></button>
-                <img src="profile.jpg" alt="" className="w-10 h-10 rounded-full border border-emerald-600" />
+                
+                <img src={profile?.profile_pic} alt="" className="w-10 h-10 rounded-full border border-emerald-600" />
             </div>
         </nav>
     );

@@ -12,9 +12,11 @@ import {
   TriangleAlert,
   X,
   PenBoxIcon,
+  Check,
 } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 
 type Profile = {
   id: string;
@@ -27,6 +29,17 @@ type Profile = {
   displayname: string;
 };
 
+type UserListing = {
+  id: number;
+  title: string;
+  description: string;
+  img: string;
+  category: string;
+  school: string;
+  price: number;
+  user_id: number;
+};
+
 export default function ProfilePage() {
   const router = useRouter();
 
@@ -37,6 +50,18 @@ export default function ProfilePage() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [logoutError, setLogoutError] = useState("");
   const [editProfile, setEditProfile] = useState(false);
+  const [posting, setposting] = useState(false);
+  const [listingForm, setListingForm] = useState({
+    title: "",
+    category: "",
+    price: "",
+    image: "",
+    description: "",
+  });
+  const [listingError, setListingError] = useState("");
+  const [isSubmittingListing, setIsSubmittingListing] = useState(false);
+  const [postSucess, setPostSucess] = useState(false);
+  const [myListings, setMyListings] = useState<UserListing[]>([]);
 
   useEffect(() => {
     async function loadProfile() {
@@ -48,6 +73,13 @@ export default function ProfilePage() {
         setProfile(data);
         setDisplayname(data.displayname ?? "");
         setProfilePic(data.profile_pic ?? "");
+
+        const currentUserId = Number(data.id);
+        const productsResponse = await fetch(`/api/product?userId=${currentUserId}`);
+        if (productsResponse.ok) {
+          const products = (await productsResponse.json()) as UserListing[];
+          setMyListings(Array.isArray(products) ? products : []);
+        }
       } catch (error) {
         console.error("Failed to load profile:", error);
       }
@@ -108,9 +140,81 @@ export default function ProfilePage() {
     .catch((error) => {
         console.log(error.message)
     })
-    .finally(
-        setEditProfile(false)
-    )
+    .finally(() => {
+      setEditProfile(false)
+      setPostSucess(true)
+      router.refresh()
+
+    })
+  }
+
+  function resetListingForm() {
+    setListingForm({
+      title: "",
+      category: "",
+      price: "",
+      image: "",
+      description: "",
+    });
+    setListingError("");
+  }
+
+  async function handleSubmitListing(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setListingError("");
+
+    const trimmedTitle = listingForm.title.trim();
+    const trimmedDescription = listingForm.description.trim();
+    const trimmedImage = listingForm.image.trim();
+    const trimmedCategory = listingForm.category.trim();
+    const numericPrice = Number(listingForm.price);
+
+    if (!trimmedTitle || !trimmedDescription || !trimmedImage || !trimmedCategory || !listingForm.price || Number.isNaN(numericPrice) || numericPrice <= 0) {
+      setListingError("Please fill in every field with a valid price.");
+      return;
+    }
+
+    setIsSubmittingListing(true);
+
+    try {
+      const response = await fetch("/api/product", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: trimmedTitle,
+          description: trimmedDescription,
+          image: trimmedImage,
+          category: trimmedCategory,
+          price: numericPrice,
+        }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data?.error || data?.message || "Unable to publish your listing.");
+      }
+
+      const refreshedProducts = await fetch(`/api/product?userId=${profile?.id ?? ""}`);
+      if (refreshedProducts.ok) {
+        const products = (await refreshedProducts.json()) as UserListing[];
+        setMyListings(Array.isArray(products) ? products : []);
+      }
+
+      resetListingForm();
+      setposting(false);
+      router.refresh();
+    } catch (error) {
+      setListingError(
+        error instanceof Error
+          ? error.message
+          : "Unable to publish your listing. Please try again."
+      );
+    } finally {
+      setIsSubmittingListing(false);
+    }
   }
 
   return (
@@ -147,7 +251,7 @@ export default function ProfilePage() {
               <h1 className="font-cabin text-4xl font-bold max-md:text-3xl">
                 {profile?.displayname || profile?.username || "Your profile"}
               </h1>
-              <p className="font-rubik font-semibold text-gray-500">
+              <p className=" font-inter font-black  text-gray-500">
                 {profile?.username ? `@${profile.username}` : ""}
               </p>
               <span className="flex items-center gap-2 font-semibold text-gray-500">
@@ -171,6 +275,10 @@ export default function ProfilePage() {
           <div className="mt-4 flex flex-wrap items-center gap-2 px-20 max-md:px-5">
             <button
               type="button"
+              onClick={() => {
+                resetListingForm();
+                setposting(true);
+              }}
               className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 font-outfit text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-500 max-md:flex-1 max-md:px-3"
             >
               <Plus size={16} />
@@ -196,9 +304,63 @@ export default function ProfilePage() {
           </div>
 
           <div className="mt-8 flex flex-col gap-4 border-t border-slate-200 px-20 pt-5 max-md:px-5">
-            <p className="text-sm text-slate-500">
-              Leaving UniLink on this device?
-            </p>
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-sm text-slate-500">My listings</p>
+              <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+                {myListings.length}
+              </span>
+            </div>
+
+            {myListings.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-5 text-sm text-slate-600">
+                You haven&apos;t posted any items yet. Use the Post button to add your first listing.
+              </div>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {myListings.map((product) => (
+                  <Link
+                    key={product.id}
+                    href={`/marketplace/${product.id}`}
+                    className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                  >
+                    <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+                      <img
+                        src={product.img}
+                        alt={product.title}
+                        className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                      />
+                      <span className="absolute left-3 top-3 rounded-full bg-emerald-600 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-white">
+                        {product.category}
+                      </span>
+                    </div>
+
+                    <div className="space-y-3 p-4">
+                      <div>
+                        <h3 className="line-clamp-2 text-lg font-bold text-slate-900">
+                          {product.title}
+                        </h3>
+                        <p className="mt-1 text-sm text-slate-500">{product.school}</p>
+                      </div>
+
+                      <p className="line-clamp-2 text-sm leading-6 text-slate-600">
+                        {product.description}
+                      </p>
+
+                      <div className="flex items-center justify-between gap-3 pt-2">
+                        <span className="text-xl font-black text-emerald-600">
+                          ₦{Number(product.price).toLocaleString()}
+                        </span>
+                        <span className="rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-600">
+                          Active
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+
+            <p className="text-sm text-slate-500">Leaving UniLink on this device?</p>
             <button
               type="button"
               onClick={() => {
@@ -349,6 +511,170 @@ export default function ProfilePage() {
               </button>
             </div>
           </section>
+        </div>
+      )}
+      {/* POST FORM */}
+      {posting && (
+        <div
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget && !isSubmittingListing) {
+              setposting(false);
+            }
+          }}
+          className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/50 p-3 backdrop-blur-sm sm:p-6"
+        >
+          <section
+            aria-labelledby="post-listing-title"
+            aria-modal="true"
+            className="flex max-h-[92svh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
+            role="dialog"
+          >
+            <header className="flex items-start justify-between gap-4 border-b border-slate-200 px-5 py-4 sm:px-7 sm:py-5">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">Marketplace</p>
+                <h2 id="post-listing-title" className="mt-1 flex items-center gap-2 font-outfit text-2xl font-bold text-slate-900">
+                  Post a new item <Plus className="text-emerald-600" size={21} />
+                </h2>
+                <p className="mt-1 text-sm text-slate-500">Add clear details so students know exactly what you&apos;re offering.</p>
+              </div>
+              <button
+                type="button"
+                aria-label="Close post form"
+                disabled={isSubmittingListing}
+                onClick={() => setposting(false)}
+                className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <X size={19} />
+              </button>
+            </header>
+
+            <form onSubmit={handleSubmitListing} className="flex flex-col overflow-hidden">
+              <div className="overflow-y-auto px-5 py-5 sm:px-7">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <label className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700 sm:col-span-2">
+                    Item title
+                    <input
+                      type="text"
+                      value={listingForm.title}
+                      onChange={(event) =>
+                        setListingForm((current) => ({ ...current, title: event.target.value }))
+                      }
+                      placeholder="e.g. MacBook Air M2"
+                      required
+                      className="min-h-11 rounded-xl border border-slate-200 bg-white px-3.5 font-normal outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/10"
+                    />
+                  </label>
+
+                  <label className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
+                    Category
+                    <select
+                      value={listingForm.category}
+                      onChange={(event) =>
+                        setListingForm((current) => ({ ...current, category: event.target.value }))
+                      }
+                      required
+                      className="min-h-11 rounded-xl border border-slate-200 bg-white px-3.5 font-normal text-slate-700 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/10"
+                    >
+                      <option value="" disabled>Select a category</option>
+                      <option value="Electronics">Electronics</option>
+                      <option value="Textbooks">Textbooks</option>
+                      <option value="Fashion">Fashion</option>
+                      <option value="Shoes">Shoes</option>
+                      <option value="Home">Home</option>
+                      <option value="Tutoring">Tutoring</option>
+                      <option value="Tech Repair">Tech Repair</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </label>
+
+                  <label className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
+                    Price (NGN)
+                    <span className="flex min-h-11 items-center rounded-xl border border-slate-200 transition focus-within:border-emerald-600 focus-within:ring-4 focus-within:ring-emerald-600/10">
+                      <span className="border-r border-slate-200 px-3.5 text-slate-500">₦</span>
+                      <input
+                        type="number"
+                        min="0"
+                        step="1"
+                        value={listingForm.price}
+                        onChange={(event) =>
+                          setListingForm((current) => ({ ...current, price: event.target.value }))
+                        }
+                        placeholder="0"
+                        required
+                        className="min-w-0 flex-1 rounded-r-xl bg-transparent px-3.5 font-normal outline-none placeholder:text-slate-400"
+                      />
+                    </span>
+                  </label>
+
+                  <label className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700 sm:col-span-2">
+                    Image URL
+                    <input
+                      type="url"
+                      value={listingForm.image}
+                      onChange={(event) =>
+                        setListingForm((current) => ({ ...current, image: event.target.value }))
+                      }
+                      placeholder="https://example.com/photo.jpg"
+                      required
+                      className="min-h-11 rounded-xl border border-slate-200 bg-white px-3.5 font-normal outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/10"
+                    />
+                    <span className="text-xs font-normal text-slate-500">Use a direct link to a clear product photo.</span>
+                  </label>
+
+                  <label className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700 sm:col-span-2">
+                    Description
+                    <textarea
+                      rows={4}
+                      value={listingForm.description}
+                      onChange={(event) =>
+                        setListingForm((current) => ({ ...current, description: event.target.value }))
+                      }
+                      placeholder="Describe the item, its condition, and any useful details..."
+                      required
+                      className="resize-y rounded-xl border border-slate-200 bg-white px-3.5 py-3 font-normal outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/10"
+                    />
+                  </label>
+                </div>
+
+                {listingError && (
+                  <p className="mt-4 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                    {listingError}
+                  </p>
+                )}
+              </div>
+
+              <footer className="flex flex-col-reverse gap-2 border-t border-slate-200 bg-slate-50 px-5 py-4 sm:flex-row sm:justify-end sm:px-7">
+                <button
+                  type="button"
+                  disabled={isSubmittingListing}
+                  onClick={() => {
+                    if (!isSubmittingListing) setposting(false);
+                  }}
+                  className="min-h-11 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingListing}
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  <Plus size={17} />
+                  {isSubmittingListing ? "Publishing..." : "Publish listing"}
+                </button>
+              </footer>
+            </form>
+          </section>
+        </div>
+      )}
+      {postSucess && (
+        <div className="fixed inset-0 w-full h-full bg-slate-950/45 z-100 backdrop-blur-sm flex justify-center items-center">
+            <div className="bg-white rounded-xl p-4 flex flex-col items-center gap-6 px-15 ">
+                <div className="bg-emerald-100 p-4 rounded-full mt-4 border-2 border-emerald-700"><Check className="text-emerald-700 font-semibold" size={40}/></div>
+                <h1 className="text-2xl font-outfit font-semibold text-center">Profile  Updated  <br />Successfully!</h1>
+                <button onClick={() => {setPostSucess(false);
+                     router.refresh()}} className="border border-slate-500 bg-slate-200 text-black font-outfit font-semibold rounded-full px-4 py-1.5 hover:bg-slate-50">Close</button>
+            </div>
         </div>
       )}
     </>

@@ -14,9 +14,9 @@ export async function GET(request: Request) {
 
     const { rows } = await pool.query(query, params);
     return NextResponse.json(rows);
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
-      { error: error.message || "Something went wrong" },
+      { error: error || "Something went wrong" },
       { status: 500 }
     );
   }
@@ -54,7 +54,8 @@ export async function POST(request: Request) {
       );
     }
     const body = await request.json();
-    const { title, description, image, category, price } = body;
+    const { title, description, image, category, price, phone } = body;
+    const trimmedPhone = String(phone ?? "").trim();
 
     if (
       !title ||
@@ -63,26 +64,28 @@ export async function POST(request: Request) {
       !category ||
       price === undefined ||
       price === null ||
-      Number(price) <= 0
+      !trimmedPhone ||
+      Number(price) <= 0 ||
+      trimmedPhone.replace(/\D/g, "").length < 7
     ) {
       return NextResponse.json(
-        { message: "Fill in all details with a valid price" },
+        { message: "Fill in all details with a valid price and phone number" },
         { status: 400 }
       );
     }
 
     await pool.query(
-      "INSERT INTO products(title, description, img, category, school, price, user_id) VALUES($1, $2, $3, $4, $5, $6, $7)",
-      [title, description, image, category, user?.school, Number(price), id]
+      "INSERT INTO products(title, description, img, category, school, price, user_id, phone) VALUES($1, $2, $3, $4, $5, $6, $7, $8)",
+      [title, description, image, category, user?.school, Number(price), id, trimmedPhone]
     );
 
     return NextResponse.json(
       { message: "Product Created" },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (err: unknown) {
     return NextResponse.json(
-      { error: error.message || "Something went wrong" },
+      { error: err || "Something went wrong" },
       { status: 500 }
     );
   }

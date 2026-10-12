@@ -149,7 +149,7 @@ export default function Marketplace() {
               value={maxPrice}
               onChange={(event) => setMaxPrice(event.target.value)}
               placeholder="Max Price"
-              className="min-h-11 w-full rounded-full border border-slate-300 bg-white px-3 text-sm font-normal outline-none placeholder:text-slate-400 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+              className="min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm font-normal outline-none placeholder:text-slate-400 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
             />
           </label>
 
@@ -157,7 +157,7 @@ export default function Marketplace() {
             type="button"
             onClick={clearFilters}
             disabled={!searchQuery && !selectedSchool && !selectedCategory && !maxPrice}
-            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-45"
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-45"
           >
             <RotateCcw size={15} />
             Clear
@@ -165,8 +165,29 @@ export default function Marketplace() {
         </section>
 
         {loading ? (
-          <div className="mt-10 flex min-h-[200px] items-center justify-center">
-            <p className="text-lg font-semibold text-gray-500">Loading products...</p>
+          <div
+            aria-label="Loading products"
+            aria-busy="true"
+            className="mt-8 grid grid-cols-3 gap-8 max-md:grid-cols-2 max-md:gap-3"
+            role="status"
+          >
+            {Array.from({ length: 6 }, (_, index) => (
+              <div
+                key={index}
+                className="animate-pulse overflow-hidden rounded-xl border border-gray-200 bg-white"
+              >
+                <div className="aspect-[4/3] bg-slate-200" />
+                <div className="space-y-3 p-4 max-md:p-3">
+                  <div className="h-3 w-2/5 rounded bg-slate-200" />
+                  <div className="h-5 w-4/5 rounded bg-slate-200" />
+                  <div className="h-px bg-slate-100" />
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="h-6 w-2/5 rounded bg-slate-200" />
+                    <div className="h-7 w-1/4 rounded-lg bg-slate-100" />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         ) : products.length === 0 ? (
           <div className="mt-10 flex flex-col gap-4 min-h-[200px] items-center justify-center">

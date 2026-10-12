@@ -22,6 +22,7 @@ type Product = {
   category: string;
   school: string;
   price: number;
+  phone: number;
 };
 
 export default function ProductPage() {
@@ -39,7 +40,7 @@ export default function ProductPage() {
       })
       .then((data) => {
         const normalized = Array.isArray(data)
-          ? data.map((product: any) => ({
+          ? data.map((product: Product) => ({
               id: Number(product.id),
               title: product.title ?? "Untitled product",
               description: product.description ?? "No description available.",
@@ -48,6 +49,7 @@ export default function ProductPage() {
               category: product.category ?? "General",
               school: product.school ?? "Unknown school",
               price: Number(product.price ?? 0),
+              phone: Number(product.phone ?? 0)
             }))
           : [];
 
@@ -128,7 +130,7 @@ export default function ProductPage() {
 
           <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
             <section className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_24px_60px_rgba(15,23,42,0.06)]">
-              <div className="relative aspect-[16/11] overflow-hidden bg-slate-100">
+              <div className="relative aspect-[1/1] max-md:aspect-[16/9] overflow-hidden bg-slate-100">
                 <img
                   src={current.img}
                   alt={current.title}
@@ -178,7 +180,13 @@ export default function ProductPage() {
                 </div>
               </div>
 
-              <button className="mt-7 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3.5 text-base font-semibold text-white shadow-sm transition hover:bg-emerald-700">
+              <button className="mt-7 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3.5 text-base font-semibold text-white shadow-sm transition hover:bg-emerald-700"
+              onClick={() => {
+                const message = `Hi could we discuss more about the ${current.title} on Unilink`
+                const url = `https://wa.me/234${current.phone}?text=${encodeURIComponent(message)}`;
+                window.open(url, "_blank");
+              }}
+                >
                 <MessageCircleMore size={20} /> Contact seller
               </button>
             </aside>

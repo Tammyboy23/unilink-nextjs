@@ -11,9 +11,9 @@ export async function GET(){
         const {rows} = await pool.query("SELECT * FROM users WHERE id = $1",[userId])
 
         return NextResponse.json(rows[0])
-    }catch(error: any){
+    }catch(error: unknown){
         return NextResponse.json(
-            {error: error.message},
+            {error: error},
             {status: 500}
         )
     }
@@ -22,15 +22,15 @@ export async function GET(){
 export async function PATCH(request: Request){
     try{
     const body = await request.json()
-    const {displayname, profile_pic, id} = body;
-    await pool.query("UPDATE users SET displayname = $1, profile_pic = $2 WHERE id = $3",[displayname, profile_pic, id])
+    const {displayname, profile_pic, phone, id} = body;
+    await pool.query("UPDATE users SET displayname = $1, profile_pic = $2, phone = $3 WHERE id = $4",[displayname, profile_pic, phone, id])
     return NextResponse.json(
         {message: "Update Successful"},
         {status: 200}
     )
-    }catch(error: any){
+    }catch(error: unknown){
         return NextResponse.json(
-            {error: error.message},
+            {error: error},
             {status: 500}
         )
     }

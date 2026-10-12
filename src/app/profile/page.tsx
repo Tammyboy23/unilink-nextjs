@@ -1,9 +1,10 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import Navbar from "../components/Navbar";
 import {
   Camera,
-  School2,
+  School,
   Plus,
   Edit3,
   Share,
@@ -16,7 +17,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 
 type Profile = {
   id: string;
@@ -27,6 +28,7 @@ type Profile = {
   password: string;
   profile_pic: string;
   displayname: string;
+  phone?: string;
 };
 
 type UserListing = {
@@ -38,18 +40,21 @@ type UserListing = {
   school: string;
   price: number;
   user_id: number;
+  phone: string;
 };
 
 export default function ProfilePage() {
   const router = useRouter();
 
-  const [profile, setProfile] = useState<Profile | null>(null);
   const [displayname, setDisplayname] = useState("");
   const [profilePic, setProfilePic] = useState("");
+  const [phone, setPhone] = useState("");
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [logoutError, setLogoutError] = useState("");
   const [editProfile, setEditProfile] = useState(false);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [profileSaveError, setProfileSaveError] = useState("");
   const [posting, setposting] = useState(false);
   const [listingForm, setListingForm] = useState({
     title: "",
@@ -57,53 +62,40 @@ export default function ProfilePage() {
     price: "",
     image: "",
     description: "",
+    phone: ""
   });
   const [listingError, setListingError] = useState("");
   const [isSubmittingListing, setIsSubmittingListing] = useState(false);
   const [postSucess, setPostSucess] = useState(false);
   const [myListings, setMyListings] = useState<UserListing[]>([]);
 
-  useEffect(() => {
-    async function loadProfile() {
-      try {
-        const response = await fetch("/api/profile");
-        if (!response.ok) return;
-
-        const data: Profile = await response.json();
-        setProfile(data);
-        setDisplayname(data.displayname ?? "");
-        setProfilePic(data.profile_pic ?? "");
-
-        const currentUserId = Number(data.id);
-        const productsResponse = await fetch(`/api/product?userId=${currentUserId}`);
-        if (productsResponse.ok) {
-          const products = (await productsResponse.json()) as UserListing[];
-          setMyListings(Array.isArray(products) ? products : []);
-        }
-      } catch (error) {
-        console.error("Failed to load profile:", error);
-      }
+  async function getProfile(): Promise<Profile> {
+    const res = await fetch("/api/profile")
+    if (!res.ok){
+        throw new Error("Failed to Fetch Profile")
     }
+    const data = await res.json()
+    return data;
+  }
 
-    loadProfile();
-  }, []);
+  const{ data: profile, refetch } = useQuery<Profile>({
+    queryKey: ["profile"],
+    queryFn: getProfile,
+
+    staleTime: 1000 * 60 * 50,
+    gcTime: 1000 * 60 * 30,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+  });
 
   function openEditProfile() {
     setDisplayname(profile?.displayname ?? "");
     setProfilePic(profile?.profile_pic ?? "");
+    setPhone(profile?.phone ?? "");
+    setProfileSaveError("");
     setEditProfile(true);
   }
 
-  function saveProfileEdits() {
-    if (profile) {
-      setProfile({
-        ...profile,
-        displayname,
-        profile_pic: profilePic,
-      });
-    }
-    setEditProfile(false);
-  }
 
   async function confirmLogout() {
     setIsLoggingOut(true);
@@ -114,7 +106,7 @@ export default function ProfilePage() {
       if (!response.ok) {
         throw new Error("Logout failed. Please try again.");
       }
-
+      refetch()
       router.replace("/login");
     } catch (error) {
       setLogoutError(
@@ -125,27 +117,40 @@ export default function ProfilePage() {
       setIsLoggingOut(false);
     }
   }
-  function saveEdits() {
-    fetch("/api/profile",{
+  async function saveEdits() {
+    setIsSavingProfile(true);
+    setProfileSaveError("");
+
+    try {
+      const response = await fetch("/api/profile", {
         method: "PATCH",
         headers: {
-            'Content-Type': "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({displayname, profile_pic: profilePic, id: profile?.id})
-    })
-    .then(res => res.json())
-    .then((data) => {
-        console.log(data)
-    })
-    .catch((error) => {
-        console.log(error.message)
-    })
-    .finally(() => {
-      setEditProfile(false)
-      setPostSucess(true)
-      router.refresh()
+        body: JSON.stringify({
+          displayname: displayname.trim(),
+          profile_pic: profilePic.trim(),
+          phone: phone.trim(),
+          id: profile?.id,
+        }),
+      });
+      const data = await response.json().catch(() => ({}));
 
-    })
+      if (!response.ok) {
+        throw new Error(data?.error || data?.message || "Failed to save profile.");
+      }
+
+      await refetch();
+      setEditProfile(false);
+      setPostSucess(true);
+      router.refresh();
+    } catch (error) {
+      setProfileSaveError(
+        error instanceof Error ? error.message : "Failed to save profile. Please try again."
+      );
+    } finally {
+      setIsSavingProfile(false);
+    }
   }
 
   function resetListingForm() {
@@ -155,6 +160,7 @@ export default function ProfilePage() {
       price: "",
       image: "",
       description: "",
+      phone: ""
     });
     setListingError("");
   }
@@ -167,10 +173,11 @@ export default function ProfilePage() {
     const trimmedDescription = listingForm.description.trim();
     const trimmedImage = listingForm.image.trim();
     const trimmedCategory = listingForm.category.trim();
+    const trimmedPhone = listingForm.phone.trim();
     const numericPrice = Number(listingForm.price);
 
-    if (!trimmedTitle || !trimmedDescription || !trimmedImage || !trimmedCategory || !listingForm.price || Number.isNaN(numericPrice) || numericPrice <= 0) {
-      setListingError("Please fill in every field with a valid price.");
+    if (!trimmedTitle || !trimmedDescription || !trimmedImage || !trimmedCategory || !listingForm.price || !trimmedPhone || Number.isNaN(numericPrice) || numericPrice <= 0 || trimmedPhone.replace(/\D/g, "").length < 7) {
+      setListingError("Please fill in every field with a valid price and phone number.");
       return;
     }
 
@@ -188,6 +195,7 @@ export default function ProfilePage() {
           image: trimmedImage,
           category: trimmedCategory,
           price: numericPrice,
+          phone: trimmedPhone
         }),
       });
 
@@ -224,16 +232,19 @@ export default function ProfilePage() {
       <main className="mb-20 mt-25 px-25 max-md:px-5">
         <div className="overflow-hidden rounded-xl bg-white pb-10">
           {/* BANNER */}
-          <div className="relative h-36 bg-emerald-500 max-md:h-26">
-            <span className="absolute right-3 top-3 flex items-center justify-center gap-2 rounded-xl border border-white px-4 py-1.5 font-outfit text-sm font-semibold text-white hover:bg-white/60">
+          <div className="relative isolate h-40 overflow-hidden bg-emerald-700 max-md:h-32">
+            <span aria-hidden="true" className="pointer-events-none absolute -right-10 -top-28 h-72 w-72 rounded-full border border-emerald-100/30 bg-emerald-500/50" />
+            <span aria-hidden="true" className="pointer-events-none absolute right-44 top-20 h-40 w-40 rounded-full border border-emerald-100/25 bg-emerald-600/50 max-md:right-20" />
+            <span aria-hidden="true" className="pointer-events-none absolute -bottom-24 left-1/3 h-48 w-48 rounded-full border border-white/15" />
+            <span className="absolute right-4 top-4 flex items-center justify-center gap-2 rounded-lg border border-white/50 bg-emerald-950/10 px-3.5 py-2 font-outfit text-sm font-semibold text-white transition hover:bg-white/15">
               <Camera size={16} />
               Edit Cover
             </span>
           </div>
 
           {/* PROFILE & INFO */}
-          <div className="-mt-20 flex flex-col gap-10 px-20 max-md:-mt-10 max-md:gap-6 max-md:px-5">
-            <div className="relative h-40 w-40 overflow-hidden rounded-full border-3 border-white max-md:h-20 max-md:w-20">
+          <div className="mt-6 flex items-center gap-6 px-10 max-md:flex-col max-md:items-start max-md:gap-4 max-md:px-5">
+            <div className="relative h-32 w-32 shrink-0 overflow-hidden rounded-2xl border-4 border-white bg-emerald-100 shadow-lg max-md:h-24 max-md:w-24">
               {profile?.profile_pic ? (
                 <img
                   src={profile.profile_pic}
@@ -241,33 +252,39 @@ export default function ProfilePage() {
                   className="h-full w-full object-cover"
                 />
               ) : (
-                <span className="flex h-full w-full items-center justify-center bg-emerald-400 text-4xl font-bold text-white">
+                <span className="flex h-full w-full items-center justify-center bg-emerald-600 font-outfit text-5xl font-bold text-white max-md:text-4xl">
                   {profile?.username?.[0]?.toUpperCase() ?? "U"}
                 </span>
               )}
             </div>
 
-            <div className="flex flex-col gap-4 max-md:gap-2">
-              <h1 className="font-cabin text-4xl font-bold max-md:text-3xl">
+            <div className="min-w-0 flex-1 pb-1 max-md:pb-0">
+              <p className="mb-1 font-outfit text-xs font-bold uppercase tracking-[0.16em] text-emerald-700">
+                Student profile
+              </p>
+              <h1 className="break-words font-cabin text-4xl font-bold leading-tight text-slate-900 max-md:text-3xl">
                 {profile?.displayname || profile?.username || "Your profile"}
               </h1>
-              <p className=" font-inter font-black  text-gray-500">
+              <p className="mt-1 font-inter text-sm font-semibold text-slate-500">
                 {profile?.username ? `@${profile.username}` : ""}
               </p>
-              <span className="flex items-center gap-2 font-semibold text-gray-500">
-                <School2 className="text-emerald-600" />
-                {profile?.school}
-              </span>
-              <p className="flex gap-2">
-                <Calendar />
-                {profile?.created_at
-                  ? new Date(profile.created_at).toLocaleDateString("en-US", {
-                      month: "long",
-                      day: "2-digit",
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                {profile?.school && (
+                  <span className="inline-flex min-h-9 items-center gap-2 rounded-lg bg-emerald-50 px-3 text-sm font-semibold text-emerald-800">
+                    <School size={16} className="shrink-0 text-emerald-700" />
+                    <span className="break-words">{profile.school}</span>
+                  </span>
+                )}
+                {profile?.created_at && (
+                  <span className="inline-flex min-h-9 items-center gap-2 rounded-lg bg-slate-100 px-3 text-sm font-medium text-slate-600">
+                    <Calendar size={16} className="shrink-0 text-slate-500" />
+                    Joined {new Date(profile.created_at).toLocaleDateString("en-US", {
+                      month: "short",
                       year: "numeric",
-                    })
-                  : ""}
-              </p>
+                    })}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
@@ -456,7 +473,9 @@ export default function ProfilePage() {
         <div
           className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950/45 p-4 backdrop-blur-sm"
           onMouseDown={(event) => {
-            if (event.target === event.currentTarget) setEditProfile(false);
+            if (event.target === event.currentTarget && !isSavingProfile) {
+              setEditProfile(false);
+            }
           }}
         >
           <section
@@ -484,6 +503,17 @@ export default function ProfilePage() {
               </label>
 
               <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
+                Phone number
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(event) => setPhone(event.target.value)}
+                  placeholder="e.g. +234 801 234 5678"
+                  className="rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+                />
+              </label>
+
+              <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
                 Profile picture URL
                 <input
                   type="text"
@@ -494,20 +524,31 @@ export default function ProfilePage() {
               </label>
             </div>
 
+            {profileSaveError && (
+              <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
+                {profileSaveError}
+              </p>
+            )}
+
             <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
               <button
                 type="button"
+                disabled={isSavingProfile}
                 onClick={() => setEditProfile(false)}
-                className="min-h-11 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                className="min-h-11 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 type="button"
+                disabled={isSavingProfile}
                 onClick={saveEdits}
-                className="min-h-11 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-wait disabled:opacity-70"
               >
-                Save changes
+                {isSavingProfile && (
+                  <span aria-hidden="true" className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                )}
+                {isSavingProfile ? "Saving..." : "Save changes"}
               </button>
             </div>
           </section>
@@ -634,6 +675,20 @@ export default function ProfilePage() {
                       className="resize-y rounded-xl border border-slate-200 bg-white px-3.5 py-3 font-normal outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/10"
                     />
                   </label>
+
+                  <label className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700 sm:col-span-2">
+                    WhatsApp number
+                    <input
+                      type="tel"
+                      value={listingForm.phone}
+                      onChange={(event) =>
+                        setListingForm((current) => ({ ...current, phone: event.target.value }))
+                      }
+                      placeholder="e.g. 08012345678"
+                      required
+                      className="min-h-11 rounded-xl border border-slate-200 bg-white px-3.5 font-normal outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/10"
+                    />
+                  </label>
                 </div>
 
                 {listingError && (
@@ -656,7 +711,17 @@ export default function ProfilePage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={isSubmittingListing}
+                  disabled={
+                    !listingForm.category.trim() ||
+                    !listingForm.description.trim() ||
+                    !listingForm.image.trim() ||
+                    !listingForm.title.trim() ||
+                    !listingForm.price ||
+                    !listingForm.phone.trim() ||
+                    !Number.isFinite(Number(listingForm.price)) ||
+                    Number(listingForm.price) <= 0 ||
+                    listingForm.phone.replace(/\D/g, "").length < 7
+                    }
                   className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-70"
                 >
                   <Plus size={17} />
@@ -668,13 +733,52 @@ export default function ProfilePage() {
         </div>
       )}
       {postSucess && (
-        <div className="fixed inset-0 w-full h-full bg-slate-950/45 z-100 backdrop-blur-sm flex justify-center items-center">
-            <div className="bg-white rounded-xl p-4 flex flex-col items-center gap-6 px-15 ">
-                <div className="bg-emerald-100 p-4 rounded-full mt-4 border-2 border-emerald-700"><Check className="text-emerald-700 font-semibold" size={40}/></div>
-                <h1 className="text-2xl font-outfit font-semibold text-center">Profile  Updated  <br />Successfully!</h1>
-                <button onClick={() => {setPostSucess(false);
-                     router.refresh()}} className="border border-slate-500 bg-slate-200 text-black font-outfit font-semibold rounded-full px-4 py-1.5 hover:bg-slate-50">Close</button>
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/50 p-4 backdrop-blur-sm"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
+              setPostSucess(false);
+              router.refresh();
+            }
+          }}
+        >
+          <section
+            aria-labelledby="profile-saved-title"
+            aria-modal="true"
+            className="w-full max-w-sm overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
+            role="dialog"
+          >
+            <div className="h-1.5 bg-emerald-500" />
+            <div className="flex flex-col items-center px-6 pb-6 pt-8 text-center sm:px-8">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 ring-8 ring-emerald-50/60">
+                <Check aria-hidden="true" className="text-emerald-700" size={30} strokeWidth={2.5} />
+              </div>
+              <p className="mt-6 text-xs font-bold uppercase tracking-[0.16em] text-emerald-700">
+                Profile settings
+              </p>
+              <h2
+                className="mt-2 font-outfit text-2xl font-bold text-slate-900"
+                id="profile-saved-title"
+              >
+                Changes saved
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-slate-600">
+                Your profile information has been updated successfully.
+              </p>
+              <button
+                type="button"
+                autoFocus
+                onClick={() => {
+                  setPostSucess(false);
+                  router.refresh();
+                }}
+                className="mt-7 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
+              >
+                <Check size={17} />
+                Done
+              </button>
             </div>
+          </section>
         </div>
       )}
     </>

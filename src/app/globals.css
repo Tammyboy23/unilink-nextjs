@@ -23,3 +23,10 @@
   --font-rubik: "Rubik", sans-serif;
   --font-tuffy: "Tuffy", sans-serif;
 }
+
+.glass {
+  background: rgba(250, 248, 248, 0.55);
+  backdrop-filter: saturate(180%) blur(24px);
+  -webkit-backdrop-filter: saturate(180%) blur(24px);
+  border: 0.5px solid rgb(255 255 255 / 0.12);
+}

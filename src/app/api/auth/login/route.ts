@@ -43,9 +43,9 @@ export async function POST(request: Request){
 
 
 
-    }catch(error: any){
+    }catch(error: unknown){
         return NextResponse.json(
-            {error: error.message},
+            {error: error},
             {status: 501}
         )
     }

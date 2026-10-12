@@ -4,17 +4,32 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Plus, ShoppingBag, LayoutDashboard, User, Bell } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+
+type Profile = {
+  id: string;
+  created_at: string;
+  username: string;
+  school: string;
+  email: string;
+  password: string;
+  profile_pic: string;
+  displayname: string;
+};
 
 export default function Navbar(){
-    const [profile, setProfile] = useState([])
+    //const [profile, setProfile] = useState<Profile | null>(null)
 
     useEffect(() => {
         fetch("/api/profile")
         .then((res) => res.json())
-        .then((data) => {
+        .then((data: Profile) => {
             setProfile(data)
         })
     },[])
+    const {data: profile, isLoading, error, refetch} = useQuery({
+        queryKey: ["profile"]
+    });
     const pathname = usePathname()
     return(
         <nav className=" fixed top-0 w-full flex items-center justify-between bg-white px-25 max-md:px-5 py-4 border-b border-gray-200 gap-40 shadow-sm z-50">

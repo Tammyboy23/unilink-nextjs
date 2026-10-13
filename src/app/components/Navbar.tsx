@@ -50,7 +50,7 @@ export default function Navbar(){
                 </Link>
             </div>
 
-            <div className="flex gap-6">
+            <div className="flex gap-6 max-md:gap-2">
                 <button className="hover:bg-slate-200 px-2.5 rounded-xl"><Bell size={20} /></button>
                 
                 <img src={profile?.profile_pic} alt="" className="w-10 h-10 rounded-full border border-emerald-600" />

@@ -70,12 +70,45 @@ export default function ProductPage() {
     return (
       <>
         <Navbar />
-        <main className="mt-20 min-h-screen bg-[#f7f8f5] px-5 pb-20 pt-10 sm:px-10 lg:px-24">
+        <main className="mb-20 mt-20 min-h-screen bg-[#f7f8f5] px-5 pb-20 pt-6 sm:px-8 lg:px-24">
           <div className="mx-auto max-w-6xl">
-            <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center">
-              <p className="font-outfit text-xl font-semibold text-slate-700">
-                Loading product...
-              </p>
+            <div aria-label="Loading product details" aria-busy="true" className="animate-pulse" role="status">
+              <div className="mb-6 flex items-center justify-between">
+                <div className="h-10 w-24 rounded-xl bg-slate-200" />
+                <div className="flex gap-2">
+                  <div className="h-11 w-11 rounded-full bg-slate-200" />
+                  <div className="h-11 w-11 rounded-full bg-slate-200" />
+                </div>
+              </div>
+
+              <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
+                <div className="aspect-square overflow-hidden rounded-[28px] bg-slate-200 max-md:aspect-[16/9]" />
+
+                <div className="rounded-[28px] border border-slate-200 bg-white p-5 sm:p-6 lg:p-7">
+                  <div className="h-4 w-2/5 rounded bg-slate-200" />
+                  <div className="mt-5 h-9 w-4/5 rounded bg-slate-200" />
+                  <div className="mt-4 h-10 rounded-xl bg-slate-100" />
+
+                  <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                    <div className="h-3 w-1/4 rounded bg-slate-200" />
+                    <div className="mt-4 space-y-2">
+                      <div className="h-4 w-full rounded bg-slate-200" />
+                      <div className="h-4 w-full rounded bg-slate-200" />
+                      <div className="h-4 w-3/5 rounded bg-slate-200" />
+                    </div>
+                  </div>
+
+                  <div className="mt-6 flex items-end justify-between gap-4 border-t border-slate-200 pt-5">
+                    <div className="w-2/5">
+                      <div className="h-3 w-1/2 rounded bg-slate-200" />
+                      <div className="mt-3 h-9 w-full rounded bg-slate-200" />
+                    </div>
+                    <div className="h-9 w-28 rounded-xl bg-emerald-50" />
+                  </div>
+
+                  <div className="mt-7 h-12 w-full rounded-xl bg-emerald-100" />
+                </div>
+              </div>
             </div>
           </div>
         </main>

@@ -108,7 +108,7 @@ export default function Marketplace() {
 
         <section
           aria-label="Search and filter products"
-          className="mt-6 flex gap-3 rounded-xl"
+          className="mt-6 flex gap-3 rounded-xl items-center"
         >
           {/* FILTER SECTION */}
           <label className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">

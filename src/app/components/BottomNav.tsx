@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, ShoppingBag, User } from "lucide-react";
+import { LayoutDashboard, ShoppingBag, User , Home} from "lucide-react";
 
 const links = [
-    { href: "/", label: "Dashboard", Icon: LayoutDashboard },
+    { href: "/", label: "Home", Icon: Home },
     { href: "/marketplace", label: "Marketplace", Icon: ShoppingBag },
     { href: "/profile", label: "Profile", Icon: User },
 ];
@@ -18,7 +18,7 @@ export default function BottomNav() {
     }
 
     return (
-        <nav aria-label="Main navigation" className=" glass fixed inset-x-0 bottom-0 z-50 border-t border-slate-200/80 bg-white/95 px-2 pt-2 shadow-[0_-8px_30px_rgba(15,23,42,0.08)] backdrop-blur-md pb-[calc(env(safe-area-inset-bottom)+0.5rem)] md:hidden">
+        <nav aria-label="Main navigation" className=" glass fixed inset-x-0 bottom-3 mx-5 rounded-full z-50 border-t border-slate-200/80 bg-white/95 px-2 pt-2 shadow-[0_-8px_30px_rgba(15,23,42,0.08)] backdrop-blur-md pb-[calc(env(safe-area-inset-bottom)+0.5rem)] md:hidden">
             <div className="mx-auto flex max-w-lg items-stretch justify-around gap-1">
                 {links.map(({ href, label, Icon }) => {
                     const active = href === "/" ? pathname === href : pathname.startsWith(href);

@@ -3,10 +3,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
-import { ArrowRight, Building2, GraduationCap, LockKeyhole, Mail, ShoppingBag, UserRound } from "lucide-react";
+import { useEffect, useState, type FormEvent } from "react";
+import { AlertCircle, ArrowRight, Building2, CheckCircle2, GraduationCap, LockKeyhole, Mail, ShoppingBag, UserRound, X } from "lucide-react";
 
 type AuthFormProps = { mode: "login" | "signup" };
+
+type ToastState = {
+    type: "success" | "error" | "info";
+    message: string;
+};
 
 const inputClassName = "w-full rounded-xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/10";
 
@@ -290,6 +295,14 @@ export default function AuthForm({ mode }: AuthFormProps) {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [toast, setToast] = useState<ToastState | null>(null);
+
+    useEffect(() => {
+        if (!toast) return;
+
+        const timer = window.setTimeout(() => setToast(null), 3500);
+        return () => window.clearTimeout(timer);
+    }, [toast]);
 
     async function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -297,11 +310,20 @@ export default function AuthForm({ mode }: AuthFormProps) {
         setSuccess("");
 
         if (isSignup && password !== confirmPassword) {
-            setError("Your passwords do not match.");
+            const message = "Your passwords do not match.";
+            setError(message);
+            setToast({ type: "error", message });
             return;
         }
 
         setIsSubmitting(true);
+        setError("");
+        setSuccess("");
+        setToast({
+            type: "info",
+            message: isSignup ? "Creating your account..." : "Signing you in...",
+        });
+
         try {
             const response = await fetch(`http://localhost:3000/api/auth/${mode}`, {
                 method: "POST",
@@ -310,15 +332,22 @@ export default function AuthForm({ mode }: AuthFormProps) {
             });
             const result = await response.json();
             if (!response.ok) {
-                throw new Error(result.error ?? result.message ?? "Something went wrong.");
+                const message = result.error ?? result.message ?? "Something went wrong.";
+                throw new Error(message);
             }
             if (isSignup) {
-                setSuccess("Your account is ready. Sign in to continue.");
+                const message = "Your account is ready. Sign in to continue.";
+                setSuccess(message);
+                setToast({ type: "success", message });
             } else {
+                const message = "Signed in successfully.";
+                setToast({ type: "success", message });
                 router.replace("/");
             }
         } catch (submitError) {
-            setError(submitError instanceof Error ? submitError.message : "Unable to connect. Please try again.");
+            const message = submitError instanceof Error ? submitError.message : "Unable to connect. Please try again.";
+            setError(message);
+            setToast({ type: "error", message });
         } finally {
             setIsSubmitting(false);
         }
@@ -326,6 +355,40 @@ export default function AuthForm({ mode }: AuthFormProps) {
 
     return (
         <main className="min-h-screen bg-[#f5f7f4] p-3 sm:p-6 lg:p-10">
+            {toast && (
+                <div className="pointer-events-none fixed right-4 top-4 z-[100] w-[min(92vw,360px)]">
+                    <div
+                        className={`flex items-start gap-3 rounded-2xl border px-4 py-3 shadow-lg backdrop-blur-sm ${
+                            toast.type === "success"
+                                ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+                                : toast.type === "error"
+                                    ? "border-red-200 bg-red-50 text-red-900"
+                                    : "border-sky-200 bg-sky-50 text-sky-900"
+                        }`}
+                        role="status"
+                    >
+                        <div className="mt-0.5 shrink-0">
+                            {toast.type === "success" ? (
+                                <CheckCircle2 size={18} className="text-emerald-600" />
+                            ) : toast.type === "error" ? (
+                                <AlertCircle size={18} className="text-red-600" />
+                            ) : (
+                                <div className="h-4 w-4 animate-spin rounded-full border-2 border-sky-300 border-t-sky-600" />
+                            )}
+                        </div>
+                        <p className="flex-1 text-sm font-medium">{toast.message}</p>
+                        <button
+                            type="button"
+                            aria-label="Dismiss notification"
+                            className="ml-1 rounded-full p-1 text-current/70 transition hover:bg-black/5"
+                            onClick={() => setToast(null)}
+                        >
+                            <X size={14} />
+                        </button>
+                    </div>
+                </div>
+            )}
+
             <div className="mx-auto grid min-h-[calc(100svh-1.5rem)] max-w-6xl overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_28px_80px_rgba(15,23,42,0.10)] sm:min-h-[calc(100svh-3rem)] lg:grid-cols-[0.95fr_1.05fr]">
                 <aside className="relative isolate flex min-h-52 flex-col justify-between overflow-hidden bg-emerald-800 p-6 text-white sm:min-h-64 sm:p-9 lg:min-h-full lg:p-12">
                     <span aria-hidden="true" className="pointer-events-none absolute -right-24 -top-28 -z-10 h-80 w-80 rounded-full border border-white/15" />
@@ -384,7 +447,17 @@ export default function AuthForm({ mode }: AuthFormProps) {
                             {error && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-3.5 py-3 text-sm text-red-700">{error}</p>}
                             {success && <p role="status" className="rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-3 text-sm text-emerald-800">{success}</p>}
                             <button className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-emerald-700 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 disabled:cursor-not-allowed disabled:opacity-60" disabled={isSubmitting} type="submit">
-                                {isSubmitting ? "Please wait..." : isSignup ? "Create account" : "Sign in"}{!isSubmitting && <ArrowRight size={17} />}
+                                {isSubmitting ? (
+                                    <>
+                                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" aria-hidden="true" />
+                                        {isSignup ? "Creating account..." : "Signing in..."}
+                                    </>
+                                ) : (
+                                    <>
+                                        {isSignup ? "Create account" : "Sign in"}
+                                        <ArrowRight size={17} />
+                                    </>
+                                )}
                             </button>
                         </form>
 

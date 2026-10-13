@@ -2,7 +2,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Plus, ShoppingBag, LayoutDashboard, User, Bell } from "lucide-react";
+import { Plus, ShoppingBag, LayoutDashboard, User, Bell, Home } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
@@ -40,7 +40,7 @@ export default function Navbar(){
 
             <div className="flex gap-6 hidden md:flex">
                 <Link href="/" className={`flex items-center gap-2 hover:text-black px-4 py-2 rounded-lg  font-semibold font-outfit ${pathname === "/"? "bg-emerald-100 text-emerald-600 hover:text-emerald-600": "text-gray-700"}`}>
-                   <LayoutDashboard size={20}/> Dashboard
+                   <Home size={20}/> Home
                 </Link>
                 <Link href="/marketplace" className={`flex items-center gap-2 hover:text-black px-4 py-2 rounded-lg  font-semibold font-outfit ${pathname === "/marketplace"? "bg-emerald-100 text-emerald-600 hover:text-emerald-600": "text-gray-700"}`}>
                    <ShoppingBag size={20}/> Marketplace

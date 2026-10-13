@@ -503,17 +503,6 @@ export default function ProfilePage() {
               </label>
 
               <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
-                Phone number
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={(event) => setPhone(event.target.value)}
-                  placeholder="e.g. +234 801 234 5678"
-                  className="rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
-                />
-              </label>
-
-              <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
                 Profile picture URL
                 <input
                   type="text"
@@ -522,6 +511,7 @@ export default function ProfilePage() {
                   className="rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
                 />
               </label>
+
             </div>
 
             {profileSaveError && (

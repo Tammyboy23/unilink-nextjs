@@ -1,45 +1,43 @@
 "use client";
 
-import { Autoplay , Pagination, Navigation} from "swiper/modules";
+import { Autoplay, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import Link  from "next/link";
-import { MoveLeft, MoveRight } from "lucide-react";
 
 import "swiper/css";
 import "swiper/css/pagination";
-import "swiper/css/navigation";
 
 const banners = [
     {
-    title: "Buy. Sell. Connect.",
+    title: "Your campus, your marketplace.",
     description:
-      "Your campus marketplace, all in one place. Find what you need, near you.",
-    image: "https://i.pinimg.com/736x/53/e3/22/53e3228b505ddf423dde5444b5028548.jpg",
+      "Discover useful finds and student-run services from people in your campus community.",
+    image: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1800&q=85",
     buttonText: "Explore Now",
-    buttonLink: "/products",
+    buttonLink: "/marketplace",
   },
   {
-    title: "Discover Campus Deals",
+    title: "Find your next campus essential.",
     description:
-      "Find amazing products and services listed by fellow students.",
-    image: "https://i.pinimg.com/736x/b2/b9/7f/b2b97fab420adedeb0f6c43592a6105a.jpg",
+      "Browse practical products and services posted by students at nearby schools.",
+    image: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=1800&q=85",
     buttonText: "Browse Products",
-    buttonLink: "/products",
+    buttonLink: "/marketplace",
   },
   {
-    title: "Got Something to Sell?",
+    title: "Ready to pass it on?",
     description:
-      "List your products and make them discoverable to other students.",
-    image: "https://i.pinimg.com/1200x/90/67/eb/9067ebc61b7b972efc65225fd6094892.jpg",
+      "List what you no longer need and connect with students looking for it.",
+    image: "https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=1800&q=85",
     buttonText: "Start Selling",
-    buttonLink: "/sell",
+    buttonLink: "/marketplace",
   },
 ]
 
 export default function HeroCarosel(){
     return(
         <Swiper 
-        modules={[Autoplay, Pagination, Navigation]}
+        modules={[Autoplay, Pagination]}
         slidesPerView={1}
         loop
         autoplay={{
@@ -47,8 +45,7 @@ export default function HeroCarosel(){
             disableOnInteraction: false,
         }}
         pagination={{ clickable: true }}
-        navigation
-        className="w-full overflow-hidden rounded-2xl">
+        className="w-full max-md:h-min-5 overflow-hidden rounded-2xl">
             {banners.map((banner) => (
                 <SwiperSlide key={banner.title}>
                     <section
@@ -66,10 +63,6 @@ export default function HeroCarosel(){
 
             {/* Text and button */}
             <div className="relative z-10 max-w-xl">
-              <span className="mb-4 inline-block rounded-full
-                bg-blue-500/30 px-4 py-2 text-sm font-medium">
-                Unilink
-              </span>
 
               <h2 className="text-3xl font-bold tracking-tight
                 md:text-5xl">
@@ -84,12 +77,11 @@ export default function HeroCarosel(){
               <Link
                 href={banner.buttonLink}
                 className="mt-6 inline-flex items-center gap-2
-                  rounded-full bg-sky-400 px-6 py-3
-                  font-semibold text-slate-950 transition
-                  hover:bg-sky-300"
+                  rounded-xl bg-emerald-700 px-6 py-3
+                  font-semibold text-white transition
+                  hover:bg-emerald-500 font-inter font-black"
               >
                 {banner.buttonText}
-                <span aria-hidden="true"><MoveRight /></span>
               </Link>
             </div>
           </section>

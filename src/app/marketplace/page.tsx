@@ -14,6 +14,8 @@ type Product = {
   category: string;
   school: string;
   price: number;
+  total_rating: number;
+  no_rating: number;
 };
 
 export default function Marketplace() {
@@ -168,7 +170,7 @@ export default function Marketplace() {
           <div
             aria-label="Loading products"
             aria-busy="true"
-            className="mt-8 grid grid-cols-3 gap-8 max-md:grid-cols-2 max-md:gap-3"
+            className="mt-8 grid grid-cols-4 gap-8 max-md:grid-cols-2 max-md:gap-3"
             role="status"
           >
             {Array.from({ length: 6 }, (_, index) => (
@@ -207,7 +209,7 @@ export default function Marketplace() {
             </button>
           </div>
         ) : (
-          <div className="mt-8 grid grid-cols-3 gap-8 max-md:grid-cols-2 max-md:gap-3">
+          <div className="mt-8 grid grid-cols-4 gap-8 max-md:grid-cols-2 max-md:gap-3">
             {filteredProducts.map((product, index) => (
               <Link
                 href={`/marketplace/${product.id}`}
@@ -220,7 +222,7 @@ export default function Marketplace() {
                     alt={product.title}
                     className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
                   />
-                  <span className="absolute left-3 top-3 rounded-full bg-emerald-600 px-4 py-1.5 text-[12px] font-semibold text-white font-outfit max-md:text-[10px]">
+                  <span className="absolute left-3 top-3 max-md:left-1 max-md:top-1 rounded-full bg-white text-emerald-500 px-4 py-1.5 text-[12px] font-semibold  font-outfit max-md:text-[10px]">
                     {product.category}
                   </span>
                 </div>
@@ -244,7 +246,7 @@ export default function Marketplace() {
 
                     <span className="flex items-center gap-2 rounded-lg border border-yellow-300 bg-yellow-50 px-2 py-1 text-sm font-semibold text-yellow-700 max-md:text-xs">
                       <Star size={14} fill="currentColor" className="text-yellow-500" />
-                      {product.rating}
+                      {Number((product.total_rating) / (product.no_rating)) || 0}
                     </span>
                   </div>
                 </div>

@@ -14,10 +14,11 @@ import {
   X,
   PenBoxIcon,
   Check,
+  Trash
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 
 type Profile = {
   id: string;
@@ -68,6 +69,8 @@ export default function ProfilePage() {
   const [isSubmittingListing, setIsSubmittingListing] = useState(false);
   const [postSucess, setPostSucess] = useState(false);
   const [myListings, setMyListings] = useState<UserListing[]>([]);
+  const [isLoadingListings, setIsLoadingListings] = useState(true);
+  const [listingsRefreshKey, setListingsRefreshKey] = useState(0);
 
   async function getProfile(): Promise<Profile> {
     const res = await fetch("/api/profile")
@@ -78,7 +81,7 @@ export default function ProfilePage() {
     return data;
   }
 
-  const{ data: profile, refetch } = useQuery<Profile>({
+  const{ data: profile, refetch, isLoading: isLoadingProfile } = useQuery<Profile>({
     queryKey: ["profile"],
     queryFn: getProfile,
 
@@ -87,6 +90,52 @@ export default function ProfilePage() {
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   });
+
+  useEffect(() => {
+    if (isLoadingProfile) return;
+
+    if (!profile?.id) {
+      setMyListings([]);
+      setIsLoadingListings(false);
+      return;
+    }
+
+    let active = true;
+
+    async function fetchUserListings() {
+      setIsLoadingListings(true);
+
+      try {
+        const response = await fetch(
+          `/api/product?userId=${encodeURIComponent(profile.id)}`
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch your listings.");
+        }
+
+        const data: unknown = await response.json();
+        if (!Array.isArray(data)) {
+          throw new Error("The listings response has an unexpected format.");
+        }
+
+        if (active) setMyListings(data as UserListing[]);
+      } catch (error) {
+        if (active) {
+          console.error("Failed to fetch user listings:", error);
+          setMyListings([]);
+        }
+      } finally {
+        if (active) setIsLoadingListings(false);
+      }
+    }
+
+    void fetchUserListings();
+
+    return () => {
+      active = false;
+    };
+  }, [isLoadingProfile, profile?.id, listingsRefreshKey]);
 
   function openEditProfile() {
     setDisplayname(profile?.displayname ?? "");
@@ -204,13 +253,7 @@ export default function ProfilePage() {
       if (!response.ok) {
         throw new Error(data?.error || data?.message || "Unable to publish your listing.");
       }
-
-      const refreshedProducts = await fetch(`/api/product?userId=${profile?.id ?? ""}`);
-      if (refreshedProducts.ok) {
-        const products = (await refreshedProducts.json()) as UserListing[];
-        setMyListings(Array.isArray(products) ? products : []);
-      }
-
+      setListingsRefreshKey((key) => key + 1);
       resetListingForm();
       setposting(false);
       router.refresh();
@@ -328,17 +371,21 @@ export default function ProfilePage() {
               </span>
             </div>
 
-            {myListings.length === 0 ? (
+            {isLoadingListings ? (
+              <p className="text-sm text-slate-500" role="status">
+                Loading your listings...
+              </p>
+            ) : myListings.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-5 text-sm text-slate-600">
                 You haven&apos;t posted any items yet. Use the Post button to add your first listing.
               </div>
             ) : (
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain pb-3 [&::-webkit-scrollbar]:hidden">
                 {myListings.map((product) => (
                   <Link
                     key={product.id}
                     href={`/marketplace/${product.id}`}
-                    className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                    className="group w-[min(72vw,260px)] flex-none snap-start overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
                   >
                     <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
                       <img
@@ -351,25 +398,34 @@ export default function ProfilePage() {
                       </span>
                     </div>
 
-                    <div className="space-y-3 p-4">
+                    <div className="space-y-2.5 p-3">
                       <div>
-                        <h3 className="line-clamp-2 text-lg font-bold text-slate-900">
+                        <h3 className="line-clamp-2 text-x1 truncate font-bold text-slate-900">
                           {product.title}
                         </h3>
-                        <p className="mt-1 text-sm text-slate-500">{product.school}</p>
+                        <p className="flex items-center gap-2 mt-1 text-xs text-slate-500"><School size={16} className="shrink-0" />{product.school}</p>
                       </div>
 
-                      <p className="line-clamp-2 text-sm leading-6 text-slate-600">
-                        {product.description}
-                      </p>
-
                       <div className="flex items-center justify-between gap-3 pt-2">
-                        <span className="text-xl font-black text-emerald-600">
+                        <span className="text-lg font-black text-emerald-600">
                           ₦{Number(product.price).toLocaleString()}
                         </span>
-                        <span className="rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-600">
-                          Active
-                        </span>
+                        <div className="flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 p-1">
+                          <button
+                            type="button"
+                            aria-label={`Edit ${product.title}`}
+                            className="flex h-8 w-8 items-center justify-center rounded-md text-slate-500 transition hover:bg-emerald-50 hover:text-emerald-700 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-emerald-600"
+                          >
+                            <PenBoxIcon size={16} />
+                          </button>
+                          <button
+                            type="button"
+                            aria-label={`Delete ${product.title}`}
+                            className="flex h-8 w-8 items-center justify-center rounded-md text-slate-500 transition hover:bg-red-50 hover:text-red-700 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-red-600"
+                          >
+                            <Trash size={16} />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </Link>
@@ -607,13 +663,29 @@ export default function ProfilePage() {
                       className="min-h-11 rounded-xl border border-slate-200 bg-white px-3.5 font-normal text-slate-700 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/10"
                     >
                       <option value="" disabled>Select a category</option>
-                      <option value="Electronics">Electronics</option>
-                      <option value="Textbooks">Textbooks</option>
-                      <option value="Fashion">Fashion</option>
-                      <option value="Shoes">Shoes</option>
-                      <option value="Home">Home</option>
-                      <option value="Tutoring">Tutoring</option>
-                      <option value="Tech Repair">Tech Repair</option>
+                      <optgroup label="Products">
+                        <option value="Electronics">Electronics</option>
+                        <option value="Textbooks">Textbooks</option>
+                        <option value="Fashion">Fashion</option>
+                        <option value="Shoes">Shoes</option>
+                        <option value="Home">Home</option>
+                      </optgroup>
+                      <optgroup label="Services">
+                        <option value="Tutoring">Tutoring</option>
+                        <option value="Barbering">Barbing</option>
+                        <option value="Hair Styling">Hair Styling</option>
+                        <option value="Makeup">Makeup</option>
+                        <option value="Photography">Photography</option>
+                        <option value="Photo Editing">Photo Editing</option>
+                        <option value="Video Editing">Video Editing</option>
+                        <option value="Graphic Design">Graphic Design</option>
+                        <option value="Web Development">Web Development</option>
+                        <option value="Tech Repair">Tech Repair</option>
+                        <option value="Writing & Editing">Writing &amp; Editing</option>
+                        <option value="Laundry">Laundry</option>
+                        <option value="Catering">Catering</option>
+                        <option value="Delivery">Delivery</option>
+                      </optgroup>
                       <option value="Other">Other</option>
                     </select>
                   </label>

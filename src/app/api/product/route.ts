@@ -90,3 +90,97 @@ export async function POST(request: Request) {
     );
   }
 }
+
+
+export async function PATCH(request: Request) {
+  try {
+    const user = await getCurrentUser();
+    const userId = Number(user?.userID);
+
+    if (!userId) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const productId = Number(body?.productId);
+    const title = String(body?.title ?? "").trim();
+    const description = String(body?.description ?? "").trim();
+    const image = String(body?.image ?? "").trim();
+    const category = String(body?.category ?? "").trim();
+    const phone = String(body?.phone ?? "").trim();
+    const price = Number(body?.price);
+
+    if (
+      !Number.isInteger(productId) ||
+      productId <= 0 ||
+      !title ||
+      !description ||
+      !image ||
+      !category ||
+      !phone ||
+      phone.replace(/\D/g, "").length < 7 ||
+      !Number.isFinite(price) ||
+      price <= 0
+    ) {
+      return NextResponse.json(
+        { message: "Provide complete listing details with a valid price and phone number." },
+        { status: 400 }
+      );
+    }
+
+    const result = await pool.query(
+      "UPDATE products SET title = $1, description = $2, img = $3, category = $4, price = $5, phone = $6 WHERE id = $7 AND user_id = $8 RETURNING id",
+      [title, description, image, category, price, phone, productId, userId]
+    );
+
+    if (result.rowCount === 0) {
+      return NextResponse.json({ message: "Listing not found." }, { status: 404 });
+    }
+
+    return NextResponse.json({ message: "Listing updated successfully." });
+  } catch (error: unknown) {
+    console.error("Error updating product:", error);
+    return NextResponse.json(
+      { message: "Something went wrong while updating the listing." },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const user = await getCurrentUser();
+    const userId = Number(user?.userID);
+
+    if (!userId) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const productId = Number(body?.productId);
+
+    if (!Number.isInteger(productId) || productId <= 0) {
+      return NextResponse.json(
+        { message: "A valid product ID is required." },
+        { status: 400 }
+      );
+    }
+
+    const result = await pool.query(
+      "DELETE FROM products WHERE id = $1 AND user_id = $2 RETURNING id",
+      [productId, userId]
+    );
+
+    if (result.rowCount === 0) {
+      return NextResponse.json({ message: "Listing not found." }, { status: 404 });
+    }
+
+    return NextResponse.json({ message: "Listing deleted successfully." });
+  } catch (error: unknown) {
+    console.error("Error deleting product:", error);
+    return NextResponse.json(
+      { message: "Something went wrong while deleting the listing." },
+      { status: 500 }
+    );
+  }
+}

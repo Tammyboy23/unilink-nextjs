@@ -246,7 +246,7 @@ export default function Marketplace() {
 
                     <span className="flex items-center gap-2 rounded-lg border border-yellow-300 bg-yellow-50 px-2 py-1 text-sm font-semibold text-yellow-700 max-md:text-xs">
                       <Star size={14} fill="currentColor" className="text-yellow-500" />
-                      {Number((product.total_rating) / (product.no_rating)) || 0}
+                      {Math.round(Number((product.total_rating) / (product.no_rating))) || 0}
                     </span>
                   </div>
                 </div>

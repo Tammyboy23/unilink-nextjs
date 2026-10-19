@@ -67,6 +67,10 @@ export default function ProfilePage() {
   });
   const [listingError, setListingError] = useState("");
   const [isSubmittingListing, setIsSubmittingListing] = useState(false);
+  const [editingListing, setEditingListing] = useState<UserListing | null>(null);
+  const [listingToDelete, setListingToDelete] = useState<UserListing | null>(null);
+  const [isDeletingListing, setIsDeletingListing] = useState(false);
+  const [deleteListingError, setDeleteListingError] = useState("");
   const [postSucess, setPostSucess] = useState(false);
   const [myListings, setMyListings] = useState<UserListing[]>([]);
   const [isLoadingListings, setIsLoadingListings] = useState(true);
@@ -214,6 +218,49 @@ export default function ProfilePage() {
     setListingError("");
   }
 
+  function openEditListing(product: UserListing) {
+    setListingForm({
+      title: product.title,
+      category: product.category,
+      price: String(product.price),
+      image: product.img,
+      description: product.description,
+      phone: product.phone,
+    });
+    setListingError("");
+    setEditingListing(product);
+    setposting(true);
+  }
+
+  async function handleDeleteListing() {
+    if (!listingToDelete) return;
+
+    setIsDeletingListing(true);
+    setDeleteListingError("");
+
+    try {
+      const response = await fetch("/api/product", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId: listingToDelete.id }),
+      });
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data?.message || "Unable to delete this listing.");
+      }
+
+      setListingToDelete(null);
+      setListingsRefreshKey((key) => key + 1);
+    } catch (error) {
+      setDeleteListingError(
+        error instanceof Error ? error.message : "Unable to delete this listing."
+      );
+    } finally {
+      setIsDeletingListing(false);
+    }
+  }
+
   async function handleSubmitListing(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setListingError("");
@@ -234,7 +281,7 @@ export default function ProfilePage() {
 
     try {
       const response = await fetch("/api/product", {
-        method: "POST",
+        method: editingListing ? "PATCH" : "POST",
         headers: {
           "Content-Type": "application/json",
         },
@@ -244,7 +291,8 @@ export default function ProfilePage() {
           image: trimmedImage,
           category: trimmedCategory,
           price: numericPrice,
-          phone: trimmedPhone
+          phone: trimmedPhone,
+          ...(editingListing ? { productId: editingListing.id } : {}),
         }),
       });
 
@@ -255,6 +303,7 @@ export default function ProfilePage() {
       }
       setListingsRefreshKey((key) => key + 1);
       resetListingForm();
+      setEditingListing(null);
       setposting(false);
       router.refresh();
     } catch (error) {
@@ -337,6 +386,7 @@ export default function ProfilePage() {
               type="button"
               onClick={() => {
                 resetListingForm();
+                setEditingListing(null);
                 setposting(true);
               }}
               className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 font-outfit text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-500 max-md:flex-1 max-md:px-3"
@@ -382,53 +432,60 @@ export default function ProfilePage() {
             ) : (
               <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain pb-3 [&::-webkit-scrollbar]:hidden">
                 {myListings.map((product) => (
-                  <Link
+                  <article
                     key={product.id}
-                    href={`/marketplace/${product.id}`}
                     className="group w-[min(72vw,260px)] flex-none snap-start overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
                   >
-                    <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
-                      <img
-                        src={product.img}
-                        alt={product.title}
-                        className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
-                      />
-                      <span className="absolute left-3 top-3 rounded-full bg-emerald-600 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-white">
-                        {product.category}
-                      </span>
-                    </div>
+                    <Link href={`/marketplace/${product.id}`} className="block">
+                      <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+                        <img
+                          src={product.img}
+                          alt={product.title}
+                          className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                        />
+                        <span className="absolute left-3 top-3 rounded-full bg-emerald-600 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-white">
+                          {product.category}
+                        </span>
+                      </div>
 
-                    <div className="space-y-2.5 p-3">
-                      <div>
-                        <h3 className="line-clamp-2 text-x1 truncate font-bold text-slate-900">
+                      <div className="space-y-2.5 p-3 pb-0">
+                        <h3 className="line-clamp-2 truncate text-base font-bold text-slate-900">
                           {product.title}
                         </h3>
-                        <p className="flex items-center gap-2 mt-1 text-xs text-slate-500"><School size={16} className="shrink-0" />{product.school}</p>
+                        <p className="mt-1 flex items-center gap-2 text-xs text-slate-500">
+                          <School size={16} className="shrink-0" />
+                          {product.school}
+                        </p>
                       </div>
+                    </Link>
 
-                      <div className="flex items-center justify-between gap-3 pt-2">
-                        <span className="text-lg font-black text-emerald-600">
-                          ₦{Number(product.price).toLocaleString()}
-                        </span>
-                        <div className="flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 p-1">
-                          <button
-                            type="button"
-                            aria-label={`Edit ${product.title}`}
-                            className="flex h-8 w-8 items-center justify-center rounded-md text-slate-500 transition hover:bg-emerald-50 hover:text-emerald-700 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-emerald-600"
-                          >
-                            <PenBoxIcon size={16} />
-                          </button>
-                          <button
-                            type="button"
-                            aria-label={`Delete ${product.title}`}
-                            className="flex h-8 w-8 items-center justify-center rounded-md text-slate-500 transition hover:bg-red-50 hover:text-red-700 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-red-600"
-                          >
-                            <Trash size={16} />
-                          </button>
-                        </div>
+                    <div className="flex items-center justify-between gap-3 p-3 pt-2">
+                      <span className="text-lg font-black text-emerald-600">
+                        ₦{Number(product.price).toLocaleString()}
+                      </span>
+                      <div className="flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 p-1">
+                        <button
+                          type="button"
+                          aria-label={`Edit ${product.title}`}
+                          onClick={() => openEditListing(product)}
+                          className="flex h-8 w-8 items-center justify-center rounded-md text-slate-500 transition hover:bg-emerald-50 hover:text-emerald-700 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-emerald-600"
+                        >
+                          <PenBoxIcon size={16} />
+                        </button>
+                        <button
+                          type="button"
+                          aria-label={`Delete ${product.title}`}
+                          onClick={() => {
+                            setDeleteListingError("");
+                            setListingToDelete(product);
+                          }}
+                          className="flex h-8 w-8 items-center justify-center rounded-md text-slate-500 transition hover:bg-red-50 hover:text-red-700 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-red-600"
+                        >
+                          <Trash size={16} />
+                        </button>
                       </div>
                     </div>
-                  </Link>
+                  </article>
                 ))}
               </div>
             )}
@@ -600,12 +657,81 @@ export default function ProfilePage() {
           </section>
         </div>
       )}
-      {/* POST FORM */}
+      {listingToDelete && (
+        <div
+          className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/50 p-4 backdrop-blur-sm"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget && !isDeletingListing) {
+              setListingToDelete(null);
+              setDeleteListingError("");
+            }
+          }}
+        >
+          <section
+            aria-labelledby="delete-listing-title"
+            aria-modal="true"
+            className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl sm:p-6"
+            role="dialog"
+          >
+            <div className="flex items-start gap-4">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-red-50 text-red-600">
+                <Trash size={20} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <h2 id="delete-listing-title" className="font-outfit text-xl font-bold text-slate-900">
+                  Delete this listing?
+                </h2>
+                <p className="mt-2 break-words text-sm leading-6 text-slate-600">
+                  “{listingToDelete.title}” will be permanently removed from the marketplace.
+                </p>
+              </div>
+              <button
+                type="button"
+                aria-label="Close delete dialog"
+                disabled={isDeletingListing}
+                onClick={() => setListingToDelete(null)}
+                className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 disabled:opacity-50"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {deleteListingError && (
+              <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
+                {deleteListingError}
+              </p>
+            )}
+
+            <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                disabled={isDeletingListing}
+                onClick={() => setListingToDelete(null)}
+                className="min-h-11 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={isDeletingListing}
+                onClick={handleDeleteListing}
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-wait disabled:opacity-60"
+              >
+                <Trash size={16} />
+                {isDeletingListing ? "Deleting..." : "Delete listing"}
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
+
+      {/* POST OR EDIT LISTING FORM */}
       {posting && (
         <div
           onMouseDown={(event) => {
             if (event.target === event.currentTarget && !isSubmittingListing) {
               setposting(false);
+              setEditingListing(null);
             }
           }}
           className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/50 p-3 backdrop-blur-sm sm:p-6"
@@ -620,15 +746,27 @@ export default function ProfilePage() {
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">Marketplace</p>
                 <h2 id="post-listing-title" className="mt-1 flex items-center gap-2 font-outfit text-2xl font-bold text-slate-900">
-                  Post a new item <Plus className="text-emerald-600" size={21} />
+                  {editingListing ? "Edit listing" : "Post a new item"}
+                  {editingListing ? (
+                    <PenBoxIcon className="text-emerald-600" size={21} />
+                  ) : (
+                    <Plus className="text-emerald-600" size={21} />
+                  )}
                 </h2>
-                <p className="mt-1 text-sm text-slate-500">Add clear details so students know exactly what you&apos;re offering.</p>
+                <p className="mt-1 text-sm text-slate-500">
+                  {editingListing
+                    ? "Update the details students see in the marketplace."
+                    : "Add clear details so students know exactly what you&apos;re offering."}
+                </p>
               </div>
               <button
                 type="button"
                 aria-label="Close post form"
                 disabled={isSubmittingListing}
-                onClick={() => setposting(false)}
+                onClick={() => {
+                  setposting(false);
+                  setEditingListing(null);
+                }}
                 className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <X size={19} />
@@ -765,7 +903,10 @@ export default function ProfilePage() {
                   type="button"
                   disabled={isSubmittingListing}
                   onClick={() => {
-                    if (!isSubmittingListing) setposting(false);
+                    if (!isSubmittingListing) {
+                      setposting(false);
+                      setEditingListing(null);
+                    }
                   }}
                   className="min-h-11 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
                 >
@@ -786,8 +927,10 @@ export default function ProfilePage() {
                     }
                   className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-70"
                 >
-                  <Plus size={17} />
-                  {isSubmittingListing ? "Publishing..." : "Publish listing"}
+                  {editingListing ? <PenBoxIcon size={17} /> : <Plus size={17} />}
+                  {isSubmittingListing
+                    ? editingListing ? "Saving..." : "Publishing..."
+                    : editingListing ? "Save changes" : "Publish listing"}
                 </button>
               </footer>
             </form>

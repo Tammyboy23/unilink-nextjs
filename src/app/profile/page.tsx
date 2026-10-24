@@ -98,7 +98,8 @@ export default function ProfilePage() {
   useEffect(() => {
     if (isLoadingProfile) return;
 
-    if (!profile?.id) {
+    const profileId = profile?.id;
+    if (!profileId) {
       setMyListings([]);
       setIsLoadingListings(false);
       return;
@@ -106,12 +107,12 @@ export default function ProfilePage() {
 
     let active = true;
 
-    async function fetchUserListings() {
+    async function fetchUserListings(userId: string) {
       setIsLoadingListings(true);
 
       try {
         const response = await fetch(
-          `/api/product?userId=${encodeURIComponent(profile.id)}`
+          `/api/product?userId=${encodeURIComponent(userId)}`
         );
 
         if (!response.ok) {
@@ -134,7 +135,7 @@ export default function ProfilePage() {
       }
     }
 
-    void fetchUserListings();
+    void fetchUserListings(profileId);
 
     return () => {
       active = false;

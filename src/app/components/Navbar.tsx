@@ -3,7 +3,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Plus, ShoppingBag, LayoutDashboard, User, Bell, Home } from "lucide-react";
-import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 type Profile = {
@@ -18,17 +17,13 @@ type Profile = {
 };
 
 export default function Navbar(){
-    //const [profile, setProfile] = useState<Profile | null>(null)
-
-    useEffect(() => {
-        fetch("/api/profile")
-        .then((res) => res.json())
-        .then((data: Profile) => {
-            setProfile(data)
-        })
-    },[])
-    const {data: profile, isLoading, error, refetch} = useQuery({
-        queryKey: ["profile"]
+    const {data: profile} = useQuery<Profile>({
+        queryKey: ["profile"],
+        queryFn: async () => {
+            const response = await fetch("/api/profile");
+            if (!response.ok) throw new Error("Failed to fetch profile");
+            return response.json();
+        },
     });
     const pathname = usePathname()
     return(

@@ -58,7 +58,7 @@ export default function ProductPage() {
               id: Number(product.id),
               title: product.title ?? "Untitled product",
               description: product.description ?? "No description available.",
-              img: product.img ?? product.image ?? "/placeholder.png",
+              img: product.img ?? "/placeholder.png",
               rating: Number(product.rating ?? 0),
               category: product.category ?? "General",
               school: product.school ?? "Unknown school",
